@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminChildrenRouteImport } from './routes/admin.children'
 import { Route as AdminFleetRouteImport } from './routes/admin.fleet'
 import { Route as AdminPeopleRouteImport } from './routes/admin.people'
+import { Route as AdminRoutesRouteImport } from './routes/admin.routes'
 import { Route as DriverIndexRouteImport } from './routes/driver.index'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
 import { Route as ParentHistoryRouteImport } from './routes/parent.history'
@@ -36,6 +38,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminChildrenRoute = AdminChildrenRouteImport.update({
+  id: '/admin/children',
+  path: '/admin/children',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminFleetRoute = AdminFleetRouteImport.update({
   id: '/admin/fleet',
   path: '/admin/fleet',
@@ -44,6 +51,11 @@ const AdminFleetRoute = AdminFleetRouteImport.update({
 const AdminPeopleRoute = AdminPeopleRouteImport.update({
   id: '/admin/people',
   path: '/admin/people',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoutesRoute = AdminRoutesRouteImport.update({
+  id: '/admin/routes',
+  path: '/admin/routes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DriverIndexRoute = DriverIndexRouteImport.update({
@@ -80,8 +92,10 @@ const ParentTrackChildIdRoute = ParentTrackChildIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin/children': typeof AdminChildrenRoute
   '/admin/fleet': typeof AdminFleetRoute
   '/admin/people': typeof AdminPeopleRoute
+  '/admin/routes': typeof AdminRoutesRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
   '/admin/': typeof AdminIndexRoute
@@ -93,8 +107,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin/children': typeof AdminChildrenRoute
   '/admin/fleet': typeof AdminFleetRoute
   '/admin/people': typeof AdminPeopleRoute
+  '/admin/routes': typeof AdminRoutesRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
   '/admin': typeof AdminIndexRoute
@@ -107,8 +123,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin/children': typeof AdminChildrenRoute
   '/admin/fleet': typeof AdminFleetRoute
   '/admin/people': typeof AdminPeopleRoute
+  '/admin/routes': typeof AdminRoutesRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
   '/admin/': typeof AdminIndexRoute
@@ -122,8 +140,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin/children'
     | '/admin/fleet'
     | '/admin/people'
+    | '/admin/routes'
     | '/parent/history'
     | '/parent/notifications'
     | '/admin/'
@@ -135,8 +155,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/admin/children'
     | '/admin/fleet'
     | '/admin/people'
+    | '/admin/routes'
     | '/parent/history'
     | '/parent/notifications'
     | '/admin'
@@ -148,8 +170,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/admin/children'
     | '/admin/fleet'
     | '/admin/people'
+    | '/admin/routes'
     | '/parent/history'
     | '/parent/notifications'
     | '/admin/'
@@ -162,8 +186,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  AdminChildrenRoute: typeof AdminChildrenRoute
   AdminFleetRoute: typeof AdminFleetRoute
   AdminPeopleRoute: typeof AdminPeopleRoute
+  AdminRoutesRoute: typeof AdminRoutesRoute
   ParentHistoryRoute: typeof ParentHistoryRoute
   ParentNotificationsRoute: typeof ParentNotificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -196,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/children': {
+      id: '/admin/children'
+      path: '/admin/children'
+      fullPath: '/admin/children'
+      preLoaderRoute: typeof AdminChildrenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/fleet': {
       id: '/admin/fleet'
       path: '/admin/fleet'
@@ -208,6 +241,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/people'
       fullPath: '/admin/people'
       preLoaderRoute: typeof AdminPeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/routes': {
+      id: '/admin/routes'
+      path: '/admin/routes'
+      fullPath: '/admin/routes'
+      preLoaderRoute: typeof AdminRoutesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/driver/': {
@@ -258,8 +298,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  AdminChildrenRoute: AdminChildrenRoute,
   AdminFleetRoute: AdminFleetRoute,
   AdminPeopleRoute: AdminPeopleRoute,
+  AdminRoutesRoute: AdminRoutesRoute,
   ParentHistoryRoute: ParentHistoryRoute,
   ParentNotificationsRoute: ParentNotificationsRoute,
   AdminIndexRoute: AdminIndexRoute,

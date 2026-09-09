@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { AppShell } from "@/components/AppShell";
 import { RequireRole } from "@/components/RequireRole";
+import { AdminNav } from "@/components/admin/AdminNav";
 import MapPanel from "@/components/MapPanel";
 import type { MapMarker } from "@/components/LiveMap";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +75,7 @@ function AdminDashboard() {
 
   return (
     <AppShell title="School operations" subtitle="Everything moving right now, at a glance.">
+      <AdminNav />
       {isLoading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : (

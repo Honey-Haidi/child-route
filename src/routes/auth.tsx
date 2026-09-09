@@ -76,6 +76,70 @@ function AuthPage() {
     }
   }
 
+  async function sendReset(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setForgotSent(true);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (showForgot) {
+    return (
+      <Centered>
+        {forgotSent ? (
+          <>
+            <h1 className="text-2xl font-semibold">Check your email</h1>
+            <p className="mt-2 text-muted-foreground">
+              If an account exists for {email}, we've sent a link to reset your password.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-semibold">Reset your password</h1>
+            <p className="mt-2 text-muted-foreground">
+              Enter your account email and we'll send you a reset link.
+            </p>
+            <form onSubmit={sendReset} className="mt-5 space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="h-12 w-full text-base" disabled={busy}>
+                {busy ? "Sending…" : "Send reset link"}
+              </Button>
+            </form>
+          </>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            setShowForgot(false);
+            setForgotSent(false);
+          }}
+          className="mt-4 w-full text-center text-sm font-medium text-primary"
+        >
+          Back to sign in
+        </button>
+      </Centered>
+    );
+  }
+
   if (checkEmail) {
     return (
       <Centered>

@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DriverIndexRouteImport } from './routes/driver.index'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
 import { Route as ParentHistoryRouteImport } from './routes/parent.history'
 import { Route as ParentNotificationsRouteImport } from './routes/parent.notifications'
+import { Route as DriverTripTripIdRouteImport } from './routes/driver.trip.$tripId'
 import { Route as ParentTrackChildIdRouteImport } from './routes/parent.track.$childId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -24,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverIndexRoute = DriverIndexRouteImport.update({
+  id: '/driver/',
+  path: '/driver/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParentIndexRoute = ParentIndexRouteImport.update({
@@ -41,6 +48,11 @@ const ParentNotificationsRoute = ParentNotificationsRouteImport.update({
   path: '/parent/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DriverTripTripIdRoute = DriverTripTripIdRouteImport.update({
+  id: '/driver/trip/$tripId',
+  path: '/driver/trip/$tripId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ParentTrackChildIdRoute = ParentTrackChildIdRouteImport.update({
   id: '/parent/track/$childId',
   path: '/parent/track/$childId',
@@ -52,7 +64,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
+  '/driver/': typeof DriverIndexRoute
   '/parent/': typeof ParentIndexRoute
+  '/driver/trip/$tripId': typeof DriverTripTripIdRoute
   '/parent/track/$childId': typeof ParentTrackChildIdRoute
 }
 export interface FileRoutesByTo {
@@ -60,7 +74,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
+  '/driver': typeof DriverIndexRoute
   '/parent': typeof ParentIndexRoute
+  '/driver/trip/$tripId': typeof DriverTripTripIdRoute
   '/parent/track/$childId': typeof ParentTrackChildIdRoute
 }
 export interface FileRoutesById {
@@ -69,7 +85,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
+  '/driver/': typeof DriverIndexRoute
   '/parent/': typeof ParentIndexRoute
+  '/driver/trip/$tripId': typeof DriverTripTripIdRoute
   '/parent/track/$childId': typeof ParentTrackChildIdRoute
 }
 export interface FileRouteTypes {
@@ -79,7 +97,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/parent/history'
     | '/parent/notifications'
+    | '/driver/'
     | '/parent/'
+    | '/driver/trip/$tripId'
     | '/parent/track/$childId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -87,7 +107,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/parent/history'
     | '/parent/notifications'
+    | '/driver'
     | '/parent'
+    | '/driver/trip/$tripId'
     | '/parent/track/$childId'
   id:
     | '__root__'
@@ -95,7 +117,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/parent/history'
     | '/parent/notifications'
+    | '/driver/'
     | '/parent/'
+    | '/driver/trip/$tripId'
     | '/parent/track/$childId'
   fileRoutesById: FileRoutesById
 }
@@ -104,7 +128,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ParentHistoryRoute: typeof ParentHistoryRoute
   ParentNotificationsRoute: typeof ParentNotificationsRoute
+  DriverIndexRoute: typeof DriverIndexRoute
   ParentIndexRoute: typeof ParentIndexRoute
+  DriverTripTripIdRoute: typeof DriverTripTripIdRoute
   ParentTrackChildIdRoute: typeof ParentTrackChildIdRoute
 }
 
@@ -122,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver/': {
+      id: '/driver/'
+      path: '/driver'
+      fullPath: '/driver/'
+      preLoaderRoute: typeof DriverIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parent/': {
@@ -145,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver/trip/$tripId': {
+      id: '/driver/trip/$tripId'
+      path: '/driver/trip/$tripId'
+      fullPath: '/driver/trip/$tripId'
+      preLoaderRoute: typeof DriverTripTripIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/parent/track/$childId': {
       id: '/parent/track/$childId'
       path: '/parent/track/$childId'
@@ -160,7 +200,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ParentHistoryRoute: ParentHistoryRoute,
   ParentNotificationsRoute: ParentNotificationsRoute,
+  DriverIndexRoute: DriverIndexRoute,
   ParentIndexRoute: ParentIndexRoute,
+  DriverTripTripIdRoute: DriverTripTripIdRoute,
   ParentTrackChildIdRoute: ParentTrackChildIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
+import { Route as ParentHistoryRouteImport } from './routes/parent.history'
+import { Route as ParentNotificationsRouteImport } from './routes/parent.notifications'
+import { Route as ParentTrackChildIdRouteImport } from './routes/parent.track.$childId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +31,81 @@ const ParentIndexRoute = ParentIndexRouteImport.update({
   path: '/parent/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParentHistoryRoute = ParentHistoryRouteImport.update({
+  id: '/parent/history',
+  path: '/parent/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParentNotificationsRoute = ParentNotificationsRouteImport.update({
+  id: '/parent/notifications',
+  path: '/parent/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParentTrackChildIdRoute = ParentTrackChildIdRouteImport.update({
+  id: '/parent/track/$childId',
+  path: '/parent/track/$childId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/parent/history': typeof ParentHistoryRoute
+  '/parent/notifications': typeof ParentNotificationsRoute
   '/parent/': typeof ParentIndexRoute
+  '/parent/track/$childId': typeof ParentTrackChildIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/parent/history': typeof ParentHistoryRoute
+  '/parent/notifications': typeof ParentNotificationsRoute
   '/parent': typeof ParentIndexRoute
+  '/parent/track/$childId': typeof ParentTrackChildIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/parent/history': typeof ParentHistoryRoute
+  '/parent/notifications': typeof ParentNotificationsRoute
   '/parent/': typeof ParentIndexRoute
+  '/parent/track/$childId': typeof ParentTrackChildIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/parent/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/parent/history'
+    | '/parent/notifications'
+    | '/parent/'
+    | '/parent/track/$childId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/parent'
-  id: '__root__' | '/' | '/auth' | '/parent/'
+  to:
+    | '/'
+    | '/auth'
+    | '/parent/history'
+    | '/parent/notifications'
+    | '/parent'
+    | '/parent/track/$childId'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/parent/history'
+    | '/parent/notifications'
+    | '/parent/'
+    | '/parent/track/$childId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  ParentHistoryRoute: typeof ParentHistoryRoute
+  ParentNotificationsRoute: typeof ParentNotificationsRoute
   ParentIndexRoute: typeof ParentIndexRoute
+  ParentTrackChildIdRoute: typeof ParentTrackChildIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,13 +131,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parent/history': {
+      id: '/parent/history'
+      path: '/parent/history'
+      fullPath: '/parent/history'
+      preLoaderRoute: typeof ParentHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parent/notifications': {
+      id: '/parent/notifications'
+      path: '/parent/notifications'
+      fullPath: '/parent/notifications'
+      preLoaderRoute: typeof ParentNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parent/track/$childId': {
+      id: '/parent/track/$childId'
+      path: '/parent/track/$childId'
+      fullPath: '/parent/track/$childId'
+      preLoaderRoute: typeof ParentTrackChildIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  ParentHistoryRoute: ParentHistoryRoute,
+  ParentNotificationsRoute: ParentNotificationsRoute,
   ParentIndexRoute: ParentIndexRoute,
+  ParentTrackChildIdRoute: ParentTrackChildIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

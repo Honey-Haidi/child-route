@@ -40,7 +40,10 @@ export function AppShell({
 
       <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6">
         {back ? (
-          <Link to={back.to} className="mb-3 inline-flex text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to={back.to as never}
+            className="mb-3 inline-flex text-sm text-muted-foreground hover:text-foreground"
+          >
             ← {back.label}
           </Link>
         ) : null}

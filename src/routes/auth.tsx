@@ -35,6 +35,9 @@ function AuthPage() {
   const [role, setRole] = useState<AppRole>("parent");
   const [busy, setBusy] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const navigate = useNavigate();
   const { session, userId } = useSession();

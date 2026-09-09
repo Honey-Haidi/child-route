@@ -114,7 +114,7 @@ function ParentDashboard() {
   );
 }
 
-function ChildCard({ child, ride }: { child: ChildRow; ride?: ActiveRide }) {
+function ChildCard({ child, ride }: { child: ChildRow; ride?: ActiveRide | undefined }) {
   return (
     <article className="surface-card flex flex-col gap-4 p-5">
       <header className="flex items-center gap-3">

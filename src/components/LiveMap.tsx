@@ -55,7 +55,8 @@ export default function LiveMap({ markers, path, className, follow = true }: Pro
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const maplibre = (await import("maplibre-gl")).default;
+      const mod: any = await import("maplibre-gl");
+      const maplibre = mod.default ?? mod;
       if (cancelled || !container.current || mapRef.current) return;
       libRef.current = maplibre;
       const first = markers[0];

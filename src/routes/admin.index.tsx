@@ -36,7 +36,7 @@ function AdminDashboard() {
         supabase
           .from("trips")
           .select("id, trip_type, status, started_at, routes(name), vehicles(reg_no), profiles:driver_id(full_name)")
-          .in("status", ACTIVE_TRIP_STATUSES as unknown as string[]),
+          .in("status", [...ACTIVE_TRIP_STATUSES]),
         supabase.from("vehicle_live").select("trip_id, lat, lng, recorded_at"),
         Promise.all([
           supabase.from("children").select("id", { count: "exact", head: true }),

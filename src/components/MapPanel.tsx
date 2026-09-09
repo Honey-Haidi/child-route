@@ -5,7 +5,7 @@ import type { MapMarker } from "./LiveMap";
 
 const LiveMap = lazy(() => import("./LiveMap"));
 
-function MapSkeleton({ className }: { className?: string }) {
+function MapSkeleton({ className }: { className?: string | undefined }) {
   return (
     <div
       className={`${className ?? "h-full w-full"} grid place-items-center rounded-xl bg-muted text-sm text-muted-foreground`}

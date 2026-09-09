@@ -55,7 +55,7 @@ function DriverHome() {
         .from("trips")
         .select("id, route_id, trip_type, status, started_at")
         .eq("driver_id", userId!)
-        .in("status", ACTIVE_TRIP_STATUSES as unknown as string[]);
+        .in("status", [...ACTIVE_TRIP_STATUSES]);
 
       return { routes: routes ?? [], trips: trips ?? [] };
     },

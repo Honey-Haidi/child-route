@@ -60,7 +60,7 @@ export function useActiveRides(childIds: string[]) {
           "child_id, status, trip_id, trips!inner(id, trip_type, status, started_at, eta_at, driver_id, routes(name), vehicles(reg_no))",
         )
         .in("child_id", childIds)
-        .in("trips.status", ACTIVE_TRIP_STATUSES as unknown as string[]);
+        .in("trips.status", [...ACTIVE_TRIP_STATUSES]);
       if (error) throw error;
 
       const rides = (data ?? []).map((row: any) => ({

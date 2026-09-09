@@ -126,7 +126,7 @@ function RoutesAdmin() {
   });
 
   const updateRoute = useMutation({
-    mutationFn: async (patch: Record<string, unknown>) => {
+    mutationFn: async (patch: { driver_id?: string | null; vehicle_id?: string | null; active?: boolean }) => {
       const { error } = await supabase.from("routes").update(patch).eq("id", selected!);
       if (error) throw new Error(error.message);
     },

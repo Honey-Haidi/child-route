@@ -67,6 +67,9 @@ function ParentDashboard() {
       nav={
         <>
           <Button asChild variant="ghost" size="sm">
+            <Link to="/parent/add-child">Add child</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
             <Link to="/parent/notifications">Alerts</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
@@ -81,11 +84,15 @@ function ParentDashboard() {
         <div className="surface-card p-6">
           <h2 className="text-lg font-semibold">No children linked yet</h2>
           <p className="mt-1 text-muted-foreground">
-            Your school adds your children to your account. To try SafeRide right now, load the demo
-            family (Ali, Sara and Ahmed on Route A).
+            Add your child with their home pickup point, and your school will place them on a van.
+            To try SafeRide right now, you can also load the demo family (Ali, Sara and Ahmed on Route A).
           </p>
+          <Button asChild className="mt-4 h-11">
+            <Link to="/parent/add-child">Add a child</Link>
+          </Button>
           <Button
-            className="mt-4 h-11"
+            variant="outline"
+            className="mt-4 ml-3 h-11"
             disabled={claiming}
             onClick={async () => {
               setClaiming(true);

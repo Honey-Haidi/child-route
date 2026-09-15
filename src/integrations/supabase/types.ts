@@ -703,6 +703,7 @@ export type Database = {
     }
     Functions: {
       child_on_driver_trip: { Args: { _child_id: string }; Returns: boolean }
+      driver_on_route: { Args: { _route_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -714,6 +715,7 @@ export type Database = {
       is_parent_of: { Args: { _child_id: string }; Returns: boolean }
       is_trip_driver: { Args: { _trip_id: string }; Returns: boolean }
       parent_can_see_trip: { Args: { _trip_id: string }; Returns: boolean }
+      parent_on_route: { Args: { _route_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "driver" | "parent"

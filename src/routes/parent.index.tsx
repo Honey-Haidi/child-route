@@ -67,6 +67,9 @@ function ParentDashboard() {
       nav={
         <>
           <Button asChild variant="ghost" size="sm">
+            <Link to="/parent/add-child">Add child</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
             <Link to="/parent/notifications">Alerts</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">

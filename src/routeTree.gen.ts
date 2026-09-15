@@ -19,6 +19,7 @@ import { Route as AdminPeopleRouteImport } from './routes/admin.people'
 import { Route as AdminRoutesRouteImport } from './routes/admin.routes'
 import { Route as DriverIndexRouteImport } from './routes/driver.index'
 import { Route as ParentIndexRouteImport } from './routes/parent.index'
+import { Route as ParentAddChildRouteImport } from './routes/parent.add-child'
 import { Route as ParentHistoryRouteImport } from './routes/parent.history'
 import { Route as ParentNotificationsRouteImport } from './routes/parent.notifications'
 import { Route as DriverTripTripIdRouteImport } from './routes/driver.trip.$tripId'
@@ -74,6 +75,11 @@ const ParentIndexRoute = ParentIndexRouteImport.update({
   path: '/parent/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParentAddChildRoute = ParentAddChildRouteImport.update({
+  id: '/parent/add-child',
+  path: '/parent/add-child',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ParentHistoryRoute = ParentHistoryRouteImport.update({
   id: '/parent/history',
   path: '/parent/history',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/admin/fleet': typeof AdminFleetRoute
   '/admin/people': typeof AdminPeopleRoute
   '/admin/routes': typeof AdminRoutesRoute
+  '/parent/add-child': typeof ParentAddChildRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
   '/admin/': typeof AdminIndexRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/admin/fleet': typeof AdminFleetRoute
   '/admin/people': typeof AdminPeopleRoute
   '/admin/routes': typeof AdminRoutesRoute
+  '/parent/add-child': typeof ParentAddChildRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
   '/admin': typeof AdminIndexRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/admin/fleet': typeof AdminFleetRoute
   '/admin/people': typeof AdminPeopleRoute
   '/admin/routes': typeof AdminRoutesRoute
+  '/parent/add-child': typeof ParentAddChildRoute
   '/parent/history': typeof ParentHistoryRoute
   '/parent/notifications': typeof ParentNotificationsRoute
   '/admin/': typeof AdminIndexRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/admin/fleet'
     | '/admin/people'
     | '/admin/routes'
+    | '/parent/add-child'
     | '/parent/history'
     | '/parent/notifications'
     | '/admin/'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/admin/fleet'
     | '/admin/people'
     | '/admin/routes'
+    | '/parent/add-child'
     | '/parent/history'
     | '/parent/notifications'
     | '/admin'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/admin/fleet'
     | '/admin/people'
     | '/admin/routes'
+    | '/parent/add-child'
     | '/parent/history'
     | '/parent/notifications'
     | '/admin/'
@@ -203,6 +215,7 @@ export interface RootRouteChildren {
   AdminFleetRoute: typeof AdminFleetRoute
   AdminPeopleRoute: typeof AdminPeopleRoute
   AdminRoutesRoute: typeof AdminRoutesRoute
+  ParentAddChildRoute: typeof ParentAddChildRoute
   ParentHistoryRoute: typeof ParentHistoryRoute
   ParentNotificationsRoute: typeof ParentNotificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parent/add-child': {
+      id: '/parent/add-child'
+      path: '/parent/add-child'
+      fullPath: '/parent/add-child'
+      preLoaderRoute: typeof ParentAddChildRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/parent/history': {
       id: '/parent/history'
       path: '/parent/history'
@@ -323,6 +343,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminFleetRoute: AdminFleetRoute,
   AdminPeopleRoute: AdminPeopleRoute,
   AdminRoutesRoute: AdminRoutesRoute,
+  ParentAddChildRoute: ParentAddChildRoute,
   ParentHistoryRoute: ParentHistoryRoute,
   ParentNotificationsRoute: ParentNotificationsRoute,
   AdminIndexRoute: AdminIndexRoute,

@@ -36,7 +36,7 @@ function AdminDashboard() {
       const [trips, live, counts] = await Promise.all([
         supabase
           .from("trips")
-          .select("id, trip_type, status, started_at, routes(name), vehicles(reg_no), profiles:driver_id(full_name)")
+          .select("id, driver_id, trip_type, status, started_at, routes(name), vehicles(reg_no)")
           .in("status", [...ACTIVE_TRIP_STATUSES]),
         supabase.from("vehicle_live").select("trip_id, lat, lng, recorded_at"),
         Promise.all([
@@ -45,8 +45,18 @@ function AdminDashboard() {
           supabase.from("vehicles").select("id", { count: "exact", head: true }),
         ]),
       ]);
+      const rows = (trips.data ?? []) as any[];
+      const driverIds = [...new Set(rows.map((t) => t.driver_id).filter(Boolean))];
+      const names = new Map<string, string>();
+      if (driverIds.length) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name")
+          .in("user_id", driverIds);
+        for (const p of profiles ?? []) names.set(p.user_id, p.full_name);
+      }
       return {
-        trips: (trips.data ?? []) as any[],
+        trips: rows.map((t) => ({ ...t, profiles: { full_name: names.get(t.driver_id) ?? "Driver" } })),
         live: live.data ?? [],
         children: counts[0].count ?? 0,
         routes: counts[1].count ?? 0,

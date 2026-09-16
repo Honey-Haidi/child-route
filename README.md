@@ -203,6 +203,24 @@ npm run build
 
 ---
 
+## Android APK (Capacitor)
+
+The project includes a Capacitor Android wrapper (`android/`) that loads the hosted app, so login, GPS and realtime tracking work exactly as in the browser.
+
+To build the APK on your own computer:
+
+1. Install [Android Studio](https://developer.android.com/studio) (includes the Android SDK).
+2. Clone this project and run `bun install`.
+3. Publish the app in Lovable, then set `server.url` in `capacitor.config.ts` to your published URL.
+4. Run `bun run android:sync` then `bun run android:open` to open Android Studio.
+5. In Android Studio: **Build → Build App Bundle(s)/APK(s) → Build APK(s)**. The APK is written to `android/app/build/outputs/apk/debug/`.
+
+For a release/Play Store build, use **Build → Generate Signed App Bundle/APK** with your own keystore.
+
+Location, wake-lock and network permissions are already declared in `android/app/src/main/AndroidManifest.xml` for driver GPS tracking.
+
+---
+
 ## Seeded demo data
 
 The migration seeds a demo environment so you can test every role immediately:

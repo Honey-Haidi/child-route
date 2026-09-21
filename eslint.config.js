@@ -41,5 +41,11 @@ export default tseslint.config(
     files: ["src/integrations/supabase/previewAuthStorage.ts"],
     rules: { "prefer-const": "off" },
   },
+  // Auto-generated from the database schema — skip formatting rules so
+  // regenerating it never breaks lint.
+  {
+    files: ["src/integrations/supabase/types.ts"],
+    rules: { "prettier/prettier": "off" },
+  },
   eslintPluginPrettier,
 );

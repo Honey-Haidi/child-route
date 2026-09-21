@@ -12,6 +12,11 @@ export type Ping = {
   timestamp: string;
 };
 
+type WakeLockLike = { release: () => Promise<void> };
+type NavigatorWithWakeLock = Navigator & {
+  wakeLock?: { request(type: "screen"): Promise<WakeLockLike> };
+};
+
 const SEND_EVERY_MS = 8000;
 const bufferKey = (tripId: string) => `saferide.buffer.${tripId}`;
 
@@ -43,7 +48,7 @@ export function useDriverTracking(tripId: string | null, enabled: boolean) {
   const [pending, setPending] = useState(0);
   const lastRef = useRef<Ping | null>(null);
   const sendingRef = useRef(false);
-  const wakeLockRef = useRef<any>(null);
+  const wakeLockRef = useRef<WakeLockLike | null>(null);
 
   useEffect(() => {
     lastRef.current = last;
@@ -102,7 +107,8 @@ export function useDriverTracking(tripId: string | null, enabled: boolean) {
 
     (async () => {
       try {
-        wakeLockRef.current = await (navigator as any).wakeLock?.request("screen");
+        const wl = (navigator as NavigatorWithWakeLock).wakeLock;
+        wakeLockRef.current = wl ? await wl.request("screen") : null;
       } catch {
         /* wake lock unavailable — the driver must keep the screen on manually */
       }

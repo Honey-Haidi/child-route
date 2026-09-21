@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { distanceMeters } from "@/lib/geo";
@@ -352,10 +353,12 @@ export const pushLocation = createServerFn({ method: "POST" })
         .select("id, name, home_lat, home_lng, home_geofence_m, school_id")
         .in("id", childIds);
 
-      const kidById = new Map((kids ?? []).map((k: any) => [k.id, k]));
+      const kidById = new Map<string, Kid>(
+        (kids ?? []).map((k) => [k.id as string, k as Kid]),
+      );
 
       for (const rider of riders ?? []) {
-        const kid: any = kidById.get(rider.child_id);
+        const kid = kidById.get(rider.child_id);
         if (!kid) continue;
         const near =
           distanceMeters(
@@ -421,7 +424,7 @@ export const pushLocation = createServerFn({ method: "POST" })
                 .from("trip_children")
                 .update({ status: "ARRIVED_AT_SCHOOL", dropped_at: new Date().toISOString() })
                 .eq("id", rider.id);
-              const kid: any = kidById.get(rider.child_id);
+              const kid = kidById.get(rider.child_id);
               await notifyParent(ctx, {
                 childId: rider.child_id,
                 tripId: trip.id,

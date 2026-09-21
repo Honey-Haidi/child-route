@@ -80,7 +80,7 @@ function RoutesAdmin() {
         )
         .order("name");
       if (error) throw error;
-      return data as any[];
+      return data as AdminRouteRow[];
     },
   });
 
@@ -94,7 +94,7 @@ function RoutesAdmin() {
         )
         .order("name");
       if (error) throw error;
-      return data as any[];
+      return data as AdminChildRow[];
     },
   });
 
@@ -193,7 +193,7 @@ function RoutesAdmin() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const assignedIds: string[] = (current?.route_children ?? []).map((rc: any) => rc.child_id);
+  const assignedIds: string[] = (current?.route_children ?? []).map((rc) => rc.child_id);
 
   return (
     <AppShell

@@ -40,6 +40,19 @@ export const Route = createFileRoute("/admin/children")({
 
 const selectClass = "h-10 w-full rounded-md border border-input bg-background px-3 text-sm";
 
+type AdminChildRow = {
+  id: string;
+  name: string;
+  grade: string | null;
+  parent_id: string | null;
+  school_id: string | null;
+  home_address: string | null;
+  home_lat: number | null;
+  home_lng: number | null;
+  active: boolean;
+  schools: { name: string } | null;
+};
+
 function ChildrenAdmin() {
   const queryClient = useQueryClient();
   const list = useServerFn(listAccounts);
@@ -66,7 +79,7 @@ function ChildrenAdmin() {
         )
         .order("name");
       if (error) throw error;
-      return data as any[];
+      return data as AdminChildRow[];
     },
   });
 

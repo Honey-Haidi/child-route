@@ -38,6 +38,15 @@ export const Route = createFileRoute("/driver/")({
   ),
 });
 
+type DriverRouteRow = {
+  id: string;
+  name: string;
+  est_minutes: number | null;
+  schools: { name: string } | null;
+  vehicles: { reg_no: string } | null;
+  route_children: { child_id: string }[] | null;
+};
+
 function DriverHome() {
   const { userId } = useSession();
   const { data: profile } = useProfile(userId);
@@ -142,7 +151,7 @@ function DriverHome() {
               </Button>
             </div>
           ) : (
-            routes.map((route: any) => {
+            routes.map((route: DriverRouteRow) => {
               const running = activeTrips.some((t) => t.route_id === route.id);
               return (
                 <div key={route.id} className="surface-card p-5">

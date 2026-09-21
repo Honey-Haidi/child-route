@@ -46,6 +46,20 @@ type HistoryRow = {
   tripStatus: string;
 };
 
+type RawHistoryRow = {
+  id: string;
+  child_id: string;
+  status: string;
+  picked_at: string | null;
+  dropped_at: string | null;
+  trips: {
+    trip_type: string;
+    status: string;
+    started_at: string | null;
+    ended_at: string | null;
+  };
+};
+
 function HistoryPage() {
   const { userId } = useSession();
   const { data: children = [] } = useMyChildren(userId);

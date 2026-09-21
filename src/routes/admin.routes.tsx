@@ -40,6 +40,32 @@ export const Route = createFileRoute("/admin/routes")({
 
 const selectClass = "h-10 w-full rounded-md border border-input bg-background px-3 text-sm";
 
+type AdminChildRow = {
+  id: string;
+  name: string;
+  grade: string | null;
+  parent_id: string | null;
+  school_id: string | null;
+  home_address: string | null;
+  home_lat: number | null;
+  home_lng: number | null;
+  active: boolean;
+  schools: { name: string } | null;
+};
+
+type AdminRouteRow = {
+  id: string;
+  name: string;
+  school_id: string | null;
+  driver_id: string | null;
+  vehicle_id: string | null;
+  est_minutes: number | null;
+  active: boolean;
+  schools: { name: string } | null;
+  vehicles: { reg_no: string } | null;
+  route_children: { child_id: string }[] | null;
+};
+
 function RoutesAdmin() {
   const queryClient = useQueryClient();
   const list = useServerFn(listAccounts);

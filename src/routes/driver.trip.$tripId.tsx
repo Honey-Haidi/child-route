@@ -54,9 +54,34 @@ type Rider = {
   name: string;
   seq: number;
   status: ChildTripStatus;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   address: string | null;
+};
+
+type TripDetail = {
+  id: string;
+  trip_type: string;
+  status: string;
+  started_at: string | null;
+  route_id: string | null;
+  routes: {
+    name: string;
+    schools: { name: string; lat: number; lng: number } | null;
+  } | null;
+};
+
+type RiderRow = {
+  id: string;
+  child_id: string;
+  seq: number;
+  status: string;
+  children: {
+    name: string | null;
+    home_lat: number | null;
+    home_lng: number | null;
+    home_address: string | null;
+  } | null;
 };
 
 function DriverTrip() {
@@ -81,7 +106,7 @@ function DriverTrip() {
         .eq("id", tripId)
         .maybeSingle();
       if (error) throw error;
-      return data as any;
+      return data as TripDetail | null;
     },
   });
 
@@ -94,12 +119,12 @@ function DriverTrip() {
         .eq("trip_id", tripId)
         .order("seq");
       if (error) throw error;
-      return (data ?? []).map((row: any) => ({
+      return (data ?? []).map((row: RiderRow) => ({
         id: row.id,
         childId: row.child_id,
         name: row.children?.name ?? "Child",
         seq: row.seq,
-        status: row.status,
+        status: row.status as ChildTripStatus,
         lat: row.children?.home_lat,
         lng: row.children?.home_lng,
         address: row.children?.home_address ?? null,

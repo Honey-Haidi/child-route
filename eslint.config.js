@@ -36,10 +36,10 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
-  // Auto-generated file — do not edit its source; relax the rule instead.
+  // Auto-generated file — do not edit its source; relax the rules instead.
   {
     files: ["src/integrations/supabase/previewAuthStorage.ts"],
-    rules: { "prefer-const": "off" },
+    rules: { "prefer-const": "off", "prettier/prettier": "off" },
   },
   // Auto-generated from the database schema — skip formatting rules so
   // regenerating it never breaks lint.

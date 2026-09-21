@@ -16,7 +16,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "SafeRide — live school transport tracking" },
       {
         property: "og:description",
-        content: "Parents see the van move in real time. Drivers tap pickup and drop-off. Schools watch every route.",
+        content:
+          "Parents see the van move in real time. Drivers tap pickup and drop-off. Schools watch every route.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -57,8 +58,8 @@ function Landing() {
             Know exactly where your child is on the school run.
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            SafeRide shows the van moving on a live map, tells you the moment your child is picked up,
-            and confirms a safe drop-off — every morning and every afternoon.
+            SafeRide shows the van moving on a live map, tells you the moment your child is picked
+            up, and confirms a safe drop-off — every morning and every afternoon.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 px-6 text-base">
@@ -66,7 +67,8 @@ function Landing() {
             </Button>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Parents see only their own children. Drivers see only the children on the trip they are driving.
+            Parents see only their own children. Drivers see only the children on the trip they are
+            driving.
           </p>
         </div>
 
@@ -76,7 +78,11 @@ function Landing() {
             ["📍", "Vehicle approaching", "An alert when the van is close to your pickup point."],
             ["✅", "Picked up", "Confirmed by the driver, with the time and place recorded."],
             ["🗺️", "Live map", "The van marker moves on its own — no refreshing."],
-            ["🏠", "Dropped off safely", "A final confirmation when your child is home or at school."],
+            [
+              "🏠",
+              "Dropped off safely",
+              "A final confirmation when your child is home or at school.",
+            ],
           ].map(([icon, title, body]) => (
             <li key={title} className="surface-card flex gap-3 p-4">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-secondary text-lg">

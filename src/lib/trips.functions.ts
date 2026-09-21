@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -9,7 +10,16 @@ const MAX_JUMP_KMH = 200;
 const FUTURE_SKEW_MS = 60_000;
 const MAX_AGE_MS = 10 * 60_000;
 
-type Ctx = { supabase: any; userId: string };
+type Ctx = { supabase: SupabaseClient; userId: string };
+
+type Kid = {
+  id: string;
+  name: string;
+  home_lat: number;
+  home_lng: number;
+  home_geofence_m: number | null;
+  school_id: string | null;
+};
 
 async function log(ctx: Ctx, action: string, entity: string, entityId: string, meta: unknown = {}) {
   await ctx.supabase.from("audit_logs").insert({
@@ -60,7 +70,8 @@ export const startTrip = createServerFn({ method: "POST" })
       .eq("id", data.routeId)
       .maybeSingle();
     if (routeError) throw new Error(routeError.message);
-    if (!route || route.driver_id !== ctx.userId) throw new Error("This route is not assigned to you.");
+    if (!route || route.driver_id !== ctx.userId)
+      throw new Error("This route is not assigned to you.");
 
     const { data: existing } = await ctx.supabase
       .from("trips")
@@ -193,7 +204,8 @@ export const setChildStatus = createServerFn({ method: "POST" })
           : `${name} was picked up from school and is on the way home.`,
       });
     } else if (data.action === "DROPOFF") {
-      if (["DROPPED_OFF", "ARRIVED_AT_SCHOOL"].includes(row.status)) return { ok: true, duplicate: true };
+      if (["DROPPED_OFF", "ARRIVED_AT_SCHOOL"].includes(row.status))
+        return { ok: true, duplicate: true };
       await ctx.supabase
         .from("trip_children")
         .update({
@@ -278,14 +290,24 @@ export const pushLocation = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (last) {
-      const seconds = Math.max(1, (recordedAt.getTime() - new Date(last.recorded_at).getTime()) / 1000);
-      const meters = distanceMeters({ lat: last.lat, lng: last.lng }, { lat: data.lat, lng: data.lng });
+      const seconds = Math.max(
+        1,
+        (recordedAt.getTime() - new Date(last.recorded_at).getTime()) / 1000,
+      );
+      const meters = distanceMeters(
+        { lat: last.lat, lng: last.lng },
+        { lat: data.lat, lng: data.lng },
+      );
       const kmh = (meters / seconds) * 3.6;
       if (kmh > MAX_JUMP_KMH) {
         await ctx.supabase.from("trip_events").insert({
           trip_id: trip.id,
           type: "SUSPICIOUS_GPS",
-          payload: { kmh: Math.round(kmh), meters: Math.round(meters), seconds: Math.round(seconds) },
+          payload: {
+            kmh: Math.round(kmh),
+            meters: Math.round(meters),
+            seconds: Math.round(seconds),
+          },
         });
         return { accepted: false, reason: "implausible_jump" };
       }
@@ -331,14 +353,16 @@ export const pushLocation = createServerFn({ method: "POST" })
         .select("id, name, home_lat, home_lng, home_geofence_m, school_id")
         .in("id", childIds);
 
-      const kidById = new Map((kids ?? []).map((k: any) => [k.id, k]));
+      const kidById = new Map<string, Kid>((kids ?? []).map((k) => [k.id as string, k as Kid]));
 
       for (const rider of riders ?? []) {
-        const kid: any = kidById.get(rider.child_id);
+        const kid = kidById.get(rider.child_id);
         if (!kid) continue;
         const near =
-          distanceMeters({ lat: kid.home_lat, lng: kid.home_lng }, { lat: data.lat, lng: data.lng }) <=
-          (kid.home_geofence_m ?? 200);
+          distanceMeters(
+            { lat: kid.home_lat, lng: kid.home_lng },
+            { lat: data.lat, lng: data.lng },
+          ) <= (kid.home_geofence_m ?? 200);
         const relevant = morning
           ? rider.status === "WAITING_FOR_PICKUP"
           : rider.status === "ON_THE_WAY" || rider.status === "PICKED_UP";
@@ -387,8 +411,10 @@ export const pushLocation = createServerFn({ method: "POST" })
             .maybeSingle();
           if (
             school &&
-            distanceMeters({ lat: school.lat, lng: school.lng }, { lat: data.lat, lng: data.lng }) <=
-              (school.geofence_m ?? 150)
+            distanceMeters(
+              { lat: school.lat, lng: school.lng },
+              { lat: data.lat, lng: data.lng },
+            ) <= (school.geofence_m ?? 150)
           ) {
             for (const rider of riders ?? []) {
               if (rider.status !== "ON_THE_WAY" && rider.status !== "PICKED_UP") continue;
@@ -396,7 +422,7 @@ export const pushLocation = createServerFn({ method: "POST" })
                 .from("trip_children")
                 .update({ status: "ARRIVED_AT_SCHOOL", dropped_at: new Date().toISOString() })
                 .eq("id", rider.id);
-              const kid: any = kidById.get(rider.child_id);
+              const kid = kidById.get(rider.child_id);
               await notifyParent(ctx, {
                 childId: rider.child_id,
                 tripId: trip.id,
@@ -460,11 +486,19 @@ export const reportIssue = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!trip || trip.driver_id !== ctx.userId) throw new Error("Trip not found for this driver.");
 
-    if (data.kind === "DELAY") await ctx.supabase.from("trips").update({ status: "DELAYED", note: data.note ?? null }).eq("id", trip.id);
+    if (data.kind === "DELAY")
+      await ctx.supabase
+        .from("trips")
+        .update({ status: "DELAYED", note: data.note ?? null })
+        .eq("id", trip.id);
     if (data.kind === "CANCEL")
       await ctx.supabase
         .from("trips")
-        .update({ status: "CANCELLED", ended_at: new Date().toISOString(), note: data.note ?? null })
+        .update({
+          status: "CANCELLED",
+          ended_at: new Date().toISOString(),
+          note: data.note ?? null,
+        })
         .eq("id", trip.id);
 
     await ctx.supabase.from("trip_events").insert({
@@ -480,8 +514,14 @@ export const reportIssue = createServerFn({ method: "POST" })
 
     const titles: Record<string, [string, string]> = {
       DELAY: ["Trip delayed", data.note || "The vehicle is running late."],
-      VEHICLE_ISSUE: ["Vehicle problem reported", data.note || "The driver reported a vehicle problem."],
-      EMERGENCY: ["Emergency reported", data.note || "The driver raised an emergency alert. The school has been notified."],
+      VEHICLE_ISSUE: [
+        "Vehicle problem reported",
+        data.note || "The driver reported a vehicle problem.",
+      ],
+      EMERGENCY: [
+        "Emergency reported",
+        data.note || "The driver raised an emergency alert. The school has been notified.",
+      ],
       CANCEL: ["Trip cancelled", data.note || "This trip has been cancelled."],
     };
     for (const rider of riders ?? []) {

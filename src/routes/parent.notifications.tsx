@@ -12,9 +12,15 @@ export const Route = createFileRoute("/parent/notifications")({
   head: () => ({
     meta: [
       { title: "Alerts — SafeRide" },
-      { name: "description", content: "Every school transport alert for your children, newest first." },
+      {
+        name: "description",
+        content: "Every school transport alert for your children, newest first.",
+      },
       { property: "og:title", content: "Alerts — SafeRide" },
-      { property: "og:description", content: "Every school transport alert for your children, newest first." },
+      {
+        property: "og:description",
+        content: "Every school transport alert for your children, newest first.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -48,7 +54,11 @@ function NotificationsPage() {
   useRealtimeInvalidate("parent-alerts", ["notifications"], [["notifications", userId]]);
 
   return (
-    <AppShell title="Alerts" subtitle="Everything that happened on your children's trips." back={{ to: "/parent", label: "My children" }}>
+    <AppShell
+      title="Alerts"
+      subtitle="Everything that happened on your children's trips."
+      back={{ to: "/parent", label: "My children" }}
+    >
       {isLoading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : rows.length === 0 ? (

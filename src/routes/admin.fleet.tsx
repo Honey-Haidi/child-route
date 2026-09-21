@@ -17,7 +17,11 @@ export const Route = createFileRoute("/admin/fleet")({
   head: () => ({
     meta: [
       { title: "Schools & vehicles — SafeRide admin" },
-      { name: "description", content: "Register schools with their arrival zone and add the vans and buses that serve them." },
+      {
+        name: "description",
+        content:
+          "Register schools with their arrival zone and add the vans and buses that serve them.",
+      },
       { property: "og:title", content: "Schools & vehicles — SafeRide admin" },
       { property: "og:description", content: "Register schools and the vehicles that serve them." },
       { property: "og:type", content: "website" },
@@ -58,8 +62,19 @@ function Fleet() {
   const { data: accounts = [] } = useQuery({ queryKey: ["admin-accounts"], queryFn: () => list() });
   const drivers = accounts.filter((a) => a.role === "driver");
 
-  const [school, setSchool] = useState({ name: "", address: "", lat: "", lng: "", geofence_m: "150" });
-  const [vehicle, setVehicle] = useState({ reg_no: "", vehicle_type: "VAN", capacity: "15", driver_id: "" });
+  const [school, setSchool] = useState({
+    name: "",
+    address: "",
+    lat: "",
+    lng: "",
+    geofence_m: "150",
+  });
+  const [vehicle, setVehicle] = useState({
+    reg_no: "",
+    vehicle_type: "VAN",
+    capacity: "15",
+    driver_id: "",
+  });
 
   const addSchool = useMutation({
     mutationFn: async () => {
@@ -100,7 +115,10 @@ function Fleet() {
 
   const assignVehicleDriver = useMutation({
     mutationFn: async (args: { id: string; driverId: string | null }) => {
-      const { error } = await supabase.from("vehicles").update({ driver_id: args.driverId }).eq("id", args.id);
+      const { error } = await supabase
+        .from("vehicles")
+        .update({ driver_id: args.driverId })
+        .eq("id", args.id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-vehicles"] }),
@@ -108,7 +126,10 @@ function Fleet() {
   });
 
   return (
-    <AppShell title="Schools & vehicles" subtitle="Where the runs finish, and what does the driving.">
+    <AppShell
+      title="Schools & vehicles"
+      subtitle="Where the runs finish, and what does the driving."
+    >
       <AdminNav />
       <div className="grid gap-5 lg:grid-cols-2">
         <Panel title="Add a school">
@@ -120,17 +141,32 @@ function Fleet() {
             }}
           >
             <Field label="Name">
-              <Input value={school.name} onChange={(e) => setSchool({ ...school, name: e.target.value })} required />
+              <Input
+                value={school.name}
+                onChange={(e) => setSchool({ ...school, name: e.target.value })}
+                required
+              />
             </Field>
             <Field label="Address">
-              <Input value={school.address} onChange={(e) => setSchool({ ...school, address: e.target.value })} />
+              <Input
+                value={school.address}
+                onChange={(e) => setSchool({ ...school, address: e.target.value })}
+              />
             </Field>
             <div className="grid grid-cols-3 gap-3">
               <Field label="Latitude">
-                <Input value={school.lat} onChange={(e) => setSchool({ ...school, lat: e.target.value })} required />
+                <Input
+                  value={school.lat}
+                  onChange={(e) => setSchool({ ...school, lat: e.target.value })}
+                  required
+                />
               </Field>
               <Field label="Longitude">
-                <Input value={school.lng} onChange={(e) => setSchool({ ...school, lng: e.target.value })} required />
+                <Input
+                  value={school.lng}
+                  onChange={(e) => setSchool({ ...school, lng: e.target.value })}
+                  required
+                />
               </Field>
               <Field label="Arrival zone (m)">
                 <Input
@@ -139,7 +175,9 @@ function Fleet() {
                 />
               </Field>
             </div>
-            <Button type="submit" disabled={addSchool.isPending}>Add school</Button>
+            <Button type="submit" disabled={addSchool.isPending}>
+              Add school
+            </Button>
           </form>
 
           <div className="mt-4 space-y-2">
@@ -161,7 +199,11 @@ function Fleet() {
             }}
           >
             <Field label="Registration number">
-              <Input value={vehicle.reg_no} onChange={(e) => setVehicle({ ...vehicle, reg_no: e.target.value })} required />
+              <Input
+                value={vehicle.reg_no}
+                onChange={(e) => setVehicle({ ...vehicle, reg_no: e.target.value })}
+                required
+              />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Type">
@@ -176,7 +218,10 @@ function Fleet() {
                 </select>
               </Field>
               <Field label="Seats">
-                <Input value={vehicle.capacity} onChange={(e) => setVehicle({ ...vehicle, capacity: e.target.value })} />
+                <Input
+                  value={vehicle.capacity}
+                  onChange={(e) => setVehicle({ ...vehicle, capacity: e.target.value })}
+                />
               </Field>
             </div>
             <Field label="Driver">
@@ -193,12 +238,17 @@ function Fleet() {
                 ))}
               </select>
             </Field>
-            <Button type="submit" disabled={addVehicle.isPending}>Add vehicle</Button>
+            <Button type="submit" disabled={addVehicle.isPending}>
+              Add vehicle
+            </Button>
           </form>
 
           <div className="mt-4 space-y-2">
             {vehicles.map((v) => (
-              <div key={v.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3">
+              <div
+                key={v.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3"
+              >
                 <div>
                   <p className="font-medium">{v.reg_no}</p>
                   <p className="text-sm text-muted-foreground">
@@ -208,7 +258,9 @@ function Fleet() {
                 <select
                   className="h-9 rounded-md border border-input bg-background px-2 text-sm"
                   value={v.driver_id ?? ""}
-                  onChange={(e) => assignVehicleDriver.mutate({ id: v.id, driverId: e.target.value || null })}
+                  onChange={(e) =>
+                    assignVehicleDriver.mutate({ id: v.id, driverId: e.target.value || null })
+                  }
                 >
                   <option value="">No driver</option>
                   {drivers.map((d) => (

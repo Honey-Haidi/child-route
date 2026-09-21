@@ -17,9 +17,15 @@ export const Route = createFileRoute("/parent/track/$childId")({
   head: () => ({
     meta: [
       { title: "Live tracking — SafeRide" },
-      { name: "description", content: "Follow the school vehicle live on the map with arrival time and distance." },
+      {
+        name: "description",
+        content: "Follow the school vehicle live on the map with arrival time and distance.",
+      },
       { property: "og:title", content: "Live tracking — SafeRide" },
-      { property: "og:description", content: "Follow the school vehicle live, with arrival time and distance remaining." },
+      {
+        property: "og:description",
+        content: "Follow the school vehicle live, with arrival time and distance remaining.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -77,7 +83,10 @@ function TrackPage() {
   useRealtimeInvalidate(
     `track-${childId}`,
     ["vehicle_live", "trip_children", "trips"],
-    [["vehicle-live", ride?.tripId, tick], ["active-rides", children.map((c) => c.id).join(",")]],
+    [
+      ["vehicle-live", ride?.tripId, tick],
+      ["active-rides", children.map((c) => c.id).join(",")],
+    ],
   );
 
   if (!child) {
@@ -96,13 +105,34 @@ function TrackPage() {
     : { lat: child.home_lat, lng: child.home_lng, label: `${child.name}'s home` };
 
   const markers: MapMarker[] = [];
-  if (live) markers.push({ id: "vehicle", lat: live.lat, lng: live.lng, label: ride?.vehicleReg ?? "Vehicle", kind: "vehicle" });
-  markers.push({ id: "home", lat: child.home_lat, lng: child.home_lng, label: "Home", kind: "home" });
-  if (school) markers.push({ id: "school", lat: school.lat, lng: school.lng, label: school.name, kind: "school" });
+  if (live)
+    markers.push({
+      id: "vehicle",
+      lat: live.lat,
+      lng: live.lng,
+      label: ride?.vehicleReg ?? "Vehicle",
+      kind: "vehicle",
+    });
+  markers.push({
+    id: "home",
+    lat: child.home_lat,
+    lng: child.home_lng,
+    label: "Home",
+    kind: "home",
+  });
+  if (school)
+    markers.push({
+      id: "school",
+      lat: school.lat,
+      lng: school.lng,
+      label: school.name,
+      kind: "school",
+    });
 
   const remaining =
     live && destination ? distanceMeters({ lat: live.lat, lng: live.lng }, destination) : null;
-  const eta = remaining != null ? etaMinutes(remaining, live?.speed ? live.speed * 3.6 : null) : null;
+  const eta =
+    remaining != null ? etaMinutes(remaining, live?.speed ? live.speed * 3.6 : null) : null;
   const stale = isStale(live?.recorded_at);
 
   const path: Array<[number, number]> = [];
@@ -113,7 +143,9 @@ function TrackPage() {
     <AppShell
       title={child.name}
       subtitle={
-        ride ? childStatusLabel(ride.childStatus, ride.tripType) : "No trip is running for this child right now."
+        ride
+          ? childStatusLabel(ride.childStatus, ride.tripType)
+          : "No trip is running for this child right now."
       }
       back={{ to: "/parent", label: "My children" }}
     >
@@ -128,7 +160,11 @@ function TrackPage() {
             {childStatusLabel(ride.childStatus, ride.tripType)}
           </div>
 
-          <MapPanel markers={markers} path={path} className="h-[380px] w-full overflow-hidden rounded-2xl border border-border" />
+          <MapPanel
+            markers={markers}
+            path={path}
+            className="h-[380px] w-full overflow-hidden rounded-2xl border border-border"
+          />
 
           {stale ? (
             <p className="rounded-xl bg-warning/20 px-4 py-3 text-sm text-warning-foreground">
@@ -139,11 +175,7 @@ function TrackPage() {
           <div className="surface-card grid gap-4 p-5 sm:grid-cols-4">
             <Field label="Driver" value={ride.driverName ?? "—"} />
             <Field label="Vehicle" value={ride.vehicleReg ?? "—"} />
-            <Field
-              label="Arrives in"
-              value={stale || eta == null ? "—" : `${eta} min`}
-              emphasis
-            />
+            <Field label="Arrives in" value={stale || eta == null ? "—" : `${eta} min`} emphasis />
             <Field label="Distance" value={remaining == null ? "—" : formatDistance(remaining)} />
           </div>
         </div>

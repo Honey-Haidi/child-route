@@ -11,12 +11,7 @@ export type ChildTripStatus =
 export type TripType = "MORNING_HOME_TO_SCHOOL" | "AFTERNOON_SCHOOL_TO_HOME";
 
 export type TripStatus =
-  | "SCHEDULED"
-  | "STARTED"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED"
-  | "DELAYED";
+  "SCHEDULED" | "STARTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "DELAYED";
 
 type Tone = "neutral" | "info" | "good" | "warn" | "bad";
 
@@ -79,7 +74,9 @@ export function childStatusIcon(status: ChildTripStatus): string {
 }
 
 export function tripTypeLabel(type: TripType): string {
-  return type === "MORNING_HOME_TO_SCHOOL" ? "Morning · Home → School" : "Afternoon · School → Home";
+  return type === "MORNING_HOME_TO_SCHOOL"
+    ? "Morning · Home → School"
+    : "Afternoon · School → Home";
 }
 
 export function tripStatusTone(status: TripStatus): string {

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { RealtimePostgresChangesFilter } from "@supabase/supabase-js";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -17,15 +18,12 @@ export function useRealtimeInvalidate(
   useEffect(() => {
     const channel = supabase.channel(channelName);
     for (const table of tables) {
-      channel.on(
-        "postgres_changes",
-        (filter
-          ? { event: "*", schema: "public", table, filter }
-          : { event: "*", schema: "public", table }) as any,
-        () => {
-          for (const key of keys) queryClient.invalidateQueries({ queryKey: key });
-        },
-      );
+      const changes: RealtimePostgresChangesFilter<"*"> = filter
+        ? { event: "*", schema: "public", table, filter }
+        : { event: "*", schema: "public", table };
+      channel.on("postgres_changes", changes, () => {
+        for (const key of keys) queryClient.invalidateQueries({ queryKey: key });
+      });
     }
     channel.subscribe();
     return () => {

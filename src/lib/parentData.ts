@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
-import { ACTIVE_TRIP_STATUSES, type ChildTripStatus, type TripStatus, type TripType } from "@/lib/status";
+import {
+  ACTIVE_TRIP_STATUSES,
+  type ChildTripStatus,
+  type TripStatus,
+  type TripType,
+} from "@/lib/status";
 
 export type ChildRow = {
   id: string;
@@ -27,6 +32,22 @@ export type ActiveRide = {
   routeName: string | null;
   driverName: string | null;
   vehicleReg: string | null;
+};
+
+type ActiveTripChildRow = {
+  child_id: string;
+  status: string;
+  trip_id: string;
+  trips: {
+    id: string;
+    trip_type: string;
+    status: string;
+    started_at: string;
+    eta_at: string | null;
+    driver_id: string | null;
+    routes: { name: string } | null;
+    vehicles: { reg_no: string } | null;
+  };
 };
 
 export function useMyChildren(userId: string | null) {
@@ -63,7 +84,7 @@ export function useActiveRides(childIds: string[]) {
         .in("trips.status", [...ACTIVE_TRIP_STATUSES]);
       if (error) throw error;
 
-      const rides = (data ?? []).map((row: any) => ({
+      const rides = (data ?? []).map((row: ActiveTripChildRow) => ({
         tripId: row.trip_id as string,
         childId: row.child_id as string,
         childStatus: row.status as ChildTripStatus,
@@ -77,7 +98,7 @@ export function useActiveRides(childIds: string[]) {
       }));
 
       const driverIds = Array.from(
-        new Set((data ?? []).map((row: any) => row.trips.driver_id).filter(Boolean)),
+        new Set((data ?? []).map((row: ActiveTripChildRow) => row.trips.driver_id).filter(Boolean)),
       );
       if (driverIds.length) {
         const { data: profiles } = await supabase
@@ -86,7 +107,8 @@ export function useActiveRides(childIds: string[]) {
           .in("user_id", driverIds as string[]);
         const byId = new Map((profiles ?? []).map((p) => [p.user_id, p.full_name]));
         for (const ride of rides) {
-          const driverId = (data ?? []).find((r: any) => r.trip_id === ride.tripId)?.trips.driver_id;
+          const driverId = (data ?? []).find((r: ActiveTripChildRow) => r.trip_id === ride.tripId)
+            ?.trips.driver_id;
           ride.driverName = (driverId && byId.get(driverId)) || null;
         }
       }

@@ -17,9 +17,16 @@ export const Route = createFileRoute("/driver/")({
   head: () => ({
     meta: [
       { title: "Driver mode — SafeRide" },
-      { name: "description", content: "Start the morning or afternoon school run, share live location and confirm each child." },
+      {
+        name: "description",
+        content:
+          "Start the morning or afternoon school run, share live location and confirm each child.",
+      },
       { property: "og:title", content: "Driver mode — SafeRide" },
-      { property: "og:description", content: "Start the school run, share live location and confirm every pickup and drop-off." },
+      {
+        property: "og:description",
+        content: "Start the school run, share live location and confirm every pickup and drop-off.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -30,6 +37,15 @@ export const Route = createFileRoute("/driver/")({
     </RequireRole>
   ),
 });
+
+type DriverRouteRow = {
+  id: string;
+  name: string;
+  est_minutes: number | null;
+  schools: { name: string } | null;
+  vehicles: { reg_no: string } | null;
+  route_children: { child_id: string }[] | null;
+};
 
 function DriverHome() {
   const { userId } = useSession();
@@ -91,11 +107,15 @@ function DriverHome() {
               <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
                 Trip in progress
               </p>
-              <p className="mt-1 text-lg font-semibold">{tripTypeLabel(trip.trip_type as TripType)}</p>
+              <p className="mt-1 text-lg font-semibold">
+                {tripTypeLabel(trip.trip_type as TripType)}
+              </p>
               <p className="text-sm text-muted-foreground">Started {formatTime(trip.started_at)}</p>
               <Button
                 className="mt-4 h-12 w-full text-base"
-                onClick={() => navigate({ to: "/driver/trip/$tripId", params: { tripId: trip.id } })}
+                onClick={() =>
+                  navigate({ to: "/driver/trip/$tripId", params: { tripId: trip.id } })
+                }
               >
                 Open trip screen
               </Button>
@@ -106,8 +126,8 @@ function DriverHome() {
             <div className="surface-card p-6">
               <h2 className="text-lg font-semibold">No route assigned yet</h2>
               <p className="mt-1 text-muted-foreground">
-                Your school assigns routes to your account. To try driver mode now, take over the demo
-                Route A with three children.
+                Your school assigns routes to your account. To try driver mode now, take over the
+                demo Route A with three children.
               </p>
               <Button
                 className="mt-4 h-11"
@@ -119,7 +139,9 @@ function DriverHome() {
                     await queryClient.invalidateQueries();
                     toast.success("Demo route assigned to you");
                   } catch (error) {
-                    toast.error(error instanceof Error ? error.message : "Could not load demo route");
+                    toast.error(
+                      error instanceof Error ? error.message : "Could not load demo route",
+                    );
                   } finally {
                     setBusy(null);
                   }
@@ -129,7 +151,7 @@ function DriverHome() {
               </Button>
             </div>
           ) : (
-            routes.map((route: any) => {
+            routes.map((route: DriverRouteRow) => {
               const running = activeTrips.some((t) => t.route_id === route.id);
               return (
                 <div key={route.id} className="surface-card p-5">

@@ -11,13 +11,36 @@ import { useRealtimeInvalidate } from "@/lib/useRealtime";
 import { ACTIVE_TRIP_STATUSES, tripTypeLabel, type TripType } from "@/lib/status";
 import { formatTime, isStale } from "@/lib/geo";
 
+type AdminTripRow = {
+  id: string;
+  driver_id: string | null;
+  trip_type: string;
+  status: string;
+  started_at: string;
+  routes: { name: string } | null;
+  vehicles: { reg_no: string } | null;
+};
+
+type AdminLiveRow = {
+  trip_id: string;
+  lat: number;
+  lng: number;
+  recorded_at: string;
+};
+
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
       { title: "School operations — SafeRide" },
-      { name: "description", content: "Live overview of every school vehicle, route and trip in progress." },
+      {
+        name: "description",
+        content: "Live overview of every school vehicle, route and trip in progress.",
+      },
       { property: "og:title", content: "School operations — SafeRide" },
-      { property: "og:description", content: "Live overview of every school vehicle, route and trip in progress." },
+      {
+        property: "og:description",
+        content: "Live overview of every school vehicle, route and trip in progress.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -45,8 +68,8 @@ function AdminDashboard() {
           supabase.from("vehicles").select("id", { count: "exact", head: true }),
         ]),
       ]);
-      const rows = (trips.data ?? []) as any[];
-      const driverIds = [...new Set(rows.map((t) => t.driver_id).filter(Boolean))];
+      const rows = (trips.data ?? []) as AdminTripRow[];
+      const driverIds = rows.flatMap((t) => (t.driver_id ? [t.driver_id] : []));
       const names = new Map<string, string>();
       if (driverIds.length) {
         const { data: profiles } = await supabase
@@ -56,7 +79,10 @@ function AdminDashboard() {
         for (const p of profiles ?? []) names.set(p.user_id, p.full_name);
       }
       return {
-        trips: rows.map((t) => ({ ...t, profiles: { full_name: names.get(t.driver_id) ?? "Driver" } })),
+        trips: rows.map((t) => ({
+          ...t,
+          profiles: { full_name: names.get(t.driver_id ?? "") ?? "Driver" },
+        })),
         live: live.data ?? [],
         children: counts[0].count ?? 0,
         routes: counts[1].count ?? 0,
@@ -68,7 +94,7 @@ function AdminDashboard() {
 
   useRealtimeInvalidate("admin-overview", ["trips", "vehicle_live"], [["admin-overview"]]);
 
-  const liveByTrip = new Map((data?.live ?? []).map((l: any) => [l.trip_id, l]));
+  const liveByTrip = new Map((data?.live ?? []).map((l: AdminLiveRow) => [l.trip_id, l] as const));
   const markers: MapMarker[] = (data?.trips ?? [])
     .map((trip) => {
       const l = liveByTrip.get(trip.id);
@@ -97,7 +123,10 @@ function AdminDashboard() {
             <Stat label="Vehicles" value={String(data?.vehicles ?? 0)} />
           </div>
 
-          <MapPanel markers={markers} className="h-[360px] w-full overflow-hidden rounded-2xl border border-border" />
+          <MapPanel
+            markers={markers}
+            className="h-[360px] w-full overflow-hidden rounded-2xl border border-border"
+          />
 
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -107,16 +136,19 @@ function AdminDashboard() {
               <p className="text-muted-foreground">No trip is running at the moment.</p>
             ) : (
               (data?.trips ?? []).map((trip) => {
-                const l = liveByTrip.get(trip.id) as any;
+                const l = liveByTrip.get(trip.id);
                 return (
-                  <article key={trip.id} className="surface-card flex flex-wrap items-center justify-between gap-3 p-4">
+                  <article
+                    key={trip.id}
+                    className="surface-card flex flex-wrap items-center justify-between gap-3 p-4"
+                  >
                     <div>
                       <p className="font-semibold">
                         {trip.routes?.name ?? "Route"} · {tripTypeLabel(trip.trip_type as TripType)}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {trip.profiles?.full_name ?? "Driver"} · {trip.vehicles?.reg_no ?? "—"} · started{" "}
-                        {formatTime(trip.started_at)}
+                        {trip.profiles?.full_name ?? "Driver"} · {trip.vehicles?.reg_no ?? "—"} ·
+                        started {formatTime(trip.started_at)}
                       </p>
                     </div>
                     <span

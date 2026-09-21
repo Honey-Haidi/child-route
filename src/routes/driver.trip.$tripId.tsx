@@ -14,16 +14,28 @@ import { useSession } from "@/lib/auth";
 import { endTrip, reportIssue, setChildStatus } from "@/lib/trips.functions";
 import { useDriverTracking } from "@/lib/useDriverTracking";
 import { useRealtimeInvalidate } from "@/lib/useRealtime";
-import { childStatusLabel, childStatusTone, tripTypeLabel, type ChildTripStatus, type TripType } from "@/lib/status";
+import {
+  childStatusLabel,
+  childStatusTone,
+  tripTypeLabel,
+  type ChildTripStatus,
+  type TripType,
+} from "@/lib/status";
 import { distanceMeters, formatDistance } from "@/lib/geo";
 
 export const Route = createFileRoute("/driver/trip/$tripId")({
   head: () => ({
     meta: [
       { title: "Trip in progress — SafeRide" },
-      { name: "description", content: "Driver trip screen: live location sharing, next stop and per-child confirmation." },
+      {
+        name: "description",
+        content: "Driver trip screen: live location sharing, next stop and per-child confirmation.",
+      },
       { property: "og:title", content: "Trip in progress — SafeRide" },
-      { property: "og:description", content: "Driver trip screen with live location sharing and per-child confirmation." },
+      {
+        property: "og:description",
+        content: "Driver trip screen with live location sharing and per-child confirmation.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -42,9 +54,34 @@ type Rider = {
   name: string;
   seq: number;
   status: ChildTripStatus;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   address: string | null;
+};
+
+type TripDetail = {
+  id: string;
+  trip_type: string;
+  status: string;
+  started_at: string | null;
+  route_id: string | null;
+  routes: {
+    name: string;
+    schools: { name: string; lat: number; lng: number } | null;
+  } | null;
+};
+
+type RiderRow = {
+  id: string;
+  child_id: string;
+  seq: number;
+  status: string;
+  children: {
+    name: string | null;
+    home_lat: number | null;
+    home_lng: number | null;
+    home_address: string | null;
+  } | null;
 };
 
 function DriverTrip() {
@@ -63,11 +100,13 @@ function DriverTrip() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trips")
-        .select("id, trip_type, status, started_at, route_id, routes(name, schools(name, lat, lng))")
+        .select(
+          "id, trip_type, status, started_at, route_id, routes(name, schools(name, lat, lng))",
+        )
         .eq("id", tripId)
         .maybeSingle();
       if (error) throw error;
-      return data as any;
+      return data as TripDetail | null;
     },
   });
 
@@ -80,14 +119,14 @@ function DriverTrip() {
         .eq("trip_id", tripId)
         .order("seq");
       if (error) throw error;
-      return (data ?? []).map((row: any) => ({
+      return (data ?? []).map((row: RiderRow) => ({
         id: row.id,
         childId: row.child_id,
         name: row.children?.name ?? "Child",
         seq: row.seq,
-        status: row.status,
-        lat: row.children?.home_lat,
-        lng: row.children?.home_lng,
+        status: row.status as ChildTripStatus,
+        lat: row.children?.home_lat ?? null,
+        lng: row.children?.home_lng ?? null,
         address: row.children?.home_address ?? null,
       }));
     },
@@ -96,7 +135,10 @@ function DriverTrip() {
   useRealtimeInvalidate(
     `driver-trip-${tripId}`,
     ["trip_children", "trips"],
-    [["trip-riders", tripId], ["trip", tripId]],
+    [
+      ["trip-riders", tripId],
+      ["trip", tripId],
+    ],
   );
 
   const running = trip ? ["STARTED", "IN_PROGRESS", "DELAYED"].includes(trip.status) : false;
@@ -116,10 +158,17 @@ function DriverTrip() {
   const markers: MapMarker[] = [];
   if (last) markers.push({ id: "me", lat: last.lat, lng: last.lng, label: "You", kind: "vehicle" });
   for (const rider of riders) {
-    if (rider.lat == null) continue;
+    if (rider.lat == null || rider.lng == null) continue;
     markers.push({ id: rider.id, lat: rider.lat, lng: rider.lng, label: rider.name, kind: "home" });
   }
-  if (school) markers.push({ id: "school", lat: school.lat, lng: school.lng, label: school.name, kind: "school" });
+  if (school)
+    markers.push({
+      id: "school",
+      lat: school.lat,
+      lng: school.lng,
+      label: school.name,
+      kind: "school",
+    });
 
   async function act(rider: Rider, action: "PICKUP" | "DROPOFF" | "ABSENT") {
     setBusy(rider.id + action);
@@ -134,7 +183,9 @@ function DriverTrip() {
         },
       });
       await queryClient.invalidateQueries({ queryKey: ["trip-riders", tripId] });
-      toast.success(res.duplicate ? "Already recorded" : `${rider.name}: ${action.toLowerCase()} recorded`);
+      toast.success(
+        res.duplicate ? "Already recorded" : `${rider.name}: ${action.toLowerCase()} recorded`,
+      );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not save");
     } finally {
@@ -167,15 +218,20 @@ function DriverTrip() {
                 : "Waiting for GPS…"}
         </div>
 
-        <MapPanel markers={markers} className="h-[300px] w-full overflow-hidden rounded-2xl border border-border" />
+        <MapPanel
+          markers={markers}
+          className="h-[300px] w-full overflow-hidden rounded-2xl border border-border"
+        />
 
         {next ? (
           <div className="surface-card p-5">
-            <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Next stop</p>
+            <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+              Next stop
+            </p>
             <p className="mt-1 text-xl font-semibold">{next.name}</p>
             <p className="text-sm text-muted-foreground">
               {next.address ?? "Pickup point"}
-              {last && next.lat != null
+              {last && next.lat != null && next.lng != null
                 ? ` · ${formatDistance(distanceMeters({ lat: last.lat, lng: last.lng }, { lat: next.lat, lng: next.lng }))} away`
                 : ""}
             </p>
@@ -187,7 +243,9 @@ function DriverTrip() {
             Children on this trip ({remaining.length} remaining)
           </h2>
           {riders.map((rider) => {
-            const done = ["ARRIVED_AT_SCHOOL", "DROPPED_OFF", "ABSENT", "CANCELLED"].includes(rider.status);
+            const done = ["ARRIVED_AT_SCHOOL", "DROPPED_OFF", "ABSENT", "CANCELLED"].includes(
+              rider.status,
+            );
             const onboard = ["PICKED_UP", "ON_THE_WAY"].includes(rider.status);
             return (
               <article key={rider.id} className="surface-card p-4">
@@ -261,7 +319,11 @@ function DriverTrip() {
                     }
                   }}
                 >
-                  {kind === "DELAY" ? "Running late" : kind === "VEHICLE_ISSUE" ? "Vehicle issue" : "Emergency"}
+                  {kind === "DELAY"
+                    ? "Running late"
+                    : kind === "VEHICLE_ISSUE"
+                      ? "Vehicle issue"
+                      : "Emergency"}
                 </Button>
               ))}
             </div>

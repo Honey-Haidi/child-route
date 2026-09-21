@@ -13,7 +13,6 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -119,7 +118,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -145,4 +143,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-

@@ -36,7 +36,7 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
-  // Auto-generated file — do not edit its source; relax the rule instead.
+  // Auto-generated file — do not edit its source; relax the prefer-const rule.
   {
     files: ["src/integrations/supabase/previewAuthStorage.ts"],
     rules: { "prefer-const": "off" },
@@ -48,4 +48,10 @@ export default tseslint.config(
     rules: { "prettier/prettier": "off" },
   },
   eslintPluginPrettier,
+  // Auto-generated file — do not edit its source; skip prettier so regenerating
+  // it never breaks lint. Placed after the prettier plugin so this wins.
+  {
+    files: ["src/integrations/supabase/previewAuthStorage.ts"],
+    rules: { "prettier/prettier": "off" },
+  },
 );

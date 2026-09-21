@@ -125,8 +125,8 @@ function DriverTrip() {
         name: row.children?.name ?? "Child",
         seq: row.seq,
         status: row.status as ChildTripStatus,
-        lat: row.children?.home_lat,
-        lng: row.children?.home_lng,
+        lat: row.children?.home_lat ?? null,
+        lng: row.children?.home_lng ?? null,
         address: row.children?.home_address ?? null,
       }));
     },
@@ -158,7 +158,7 @@ function DriverTrip() {
   const markers: MapMarker[] = [];
   if (last) markers.push({ id: "me", lat: last.lat, lng: last.lng, label: "You", kind: "vehicle" });
   for (const rider of riders) {
-    if (rider.lat == null) continue;
+    if (rider.lat == null || rider.lng == null) continue;
     markers.push({ id: rider.id, lat: rider.lat, lng: rider.lng, label: rider.name, kind: "home" });
   }
   if (school)
@@ -231,7 +231,7 @@ function DriverTrip() {
             <p className="mt-1 text-xl font-semibold">{next.name}</p>
             <p className="text-sm text-muted-foreground">
               {next.address ?? "Pickup point"}
-              {last && next.lat != null
+              {last && next.lat != null && next.lng != null
                 ? ` · ${formatDistance(distanceMeters({ lat: last.lat, lng: last.lng }, { lat: next.lat, lng: next.lng }))} away`
                 : ""}
             </p>

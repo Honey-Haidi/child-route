@@ -12,7 +12,7 @@ export function AppShell({
   back,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   children: ReactNode;
   nav?: ReactNode;
   back?: { to: string; label: string };

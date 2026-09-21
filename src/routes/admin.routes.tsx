@@ -106,7 +106,7 @@ function RoutesAdmin() {
         )
         .order("name");
       if (error) throw error;
-      return data as AdminRouteRow[];
+      return data as AdminChildRow[];
     },
   });
 
@@ -120,7 +120,7 @@ function RoutesAdmin() {
         )
         .order("name");
       if (error) throw error;
-      return data as AdminChildRow[];
+      return data as AdminRouteRow[];
     },
   });
 

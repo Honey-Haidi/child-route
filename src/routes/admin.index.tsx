@@ -69,7 +69,7 @@ function AdminDashboard() {
         ]),
       ]);
       const rows = (trips.data ?? []) as AdminTripRow[];
-      const driverIds = [...new Set(rows.map((t) => t.driver_id).filter(Boolean))];
+      const driverIds = rows.flatMap((t) => (t.driver_id ? [t.driver_id] : []));
       const names = new Map<string, string>();
       if (driverIds.length) {
         const { data: profiles } = await supabase
@@ -94,9 +94,7 @@ function AdminDashboard() {
 
   useRealtimeInvalidate("admin-overview", ["trips", "vehicle_live"], [["admin-overview"]]);
 
-  const liveByTrip = new Map(
-    (data?.live ?? []).map((l: AdminLiveRow) => [l.trip_id, l] as const),
-  );
+  const liveByTrip = new Map((data?.live ?? []).map((l: AdminLiveRow) => [l.trip_id, l] as const));
   const markers: MapMarker[] = (data?.trips ?? [])
     .map((trip) => {
       const l = liveByTrip.get(trip.id);

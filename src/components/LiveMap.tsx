@@ -65,7 +65,7 @@ export default function LiveMap({ markers, path, className, follow = true }: Pro
     let cancelled = false;
     (async () => {
       const mod = await import("maplibre-gl");
-      const maplibre = mod.default ?? mod;
+      const maplibre = (mod as MapLibreModule & { default?: MapLibreModule }).default ?? mod;
       if (cancelled || !container.current || mapRef.current) return;
       libRef.current = maplibre;
       const first = markers[0];

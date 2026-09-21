@@ -18,11 +18,9 @@ export function useRealtimeInvalidate(
   useEffect(() => {
     const channel = supabase.channel(channelName);
     for (const table of tables) {
-      const changes = (
-        filter
-          ? { event: "*", schema: "public", table, filter }
-          : { event: "*", schema: "public", table }
-      ) as RealtimePostgresChangesFilter<"public.*">;
+      const changes: RealtimePostgresChangesFilter<"*"> = filter
+        ? { event: "*", schema: "public", table, filter }
+        : { event: "*", schema: "public", table };
       channel.on("postgres_changes", changes, () => {
         for (const key of keys) queryClient.invalidateQueries({ queryKey: key });
       });

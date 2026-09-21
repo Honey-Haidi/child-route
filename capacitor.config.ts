@@ -5,9 +5,8 @@ const config: CapacitorConfig = {
   appName: "SafeRide",
   webDir: "public",
   server: {
-    // Stable preview URL serving the latest build.
-    // After publishing, replace with your published URL.
-    url: "https://project--ecee0f21-3a38-44bc-83ad-eb526d33874c-dev.lovable.app",
+    // Stable published (production) URL. Requires the app to be published.
+    url: "https://project--ecee0f21-3a38-44bc-83ad-eb526d33874c.lovable.app",
     cleartext: false,
   },
   android: {

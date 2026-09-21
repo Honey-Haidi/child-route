@@ -79,14 +79,14 @@ function HistoryPage() {
         .limit(60);
       if (error) throw error;
       const nameById = new Map(children.map((c) => [c.id, c.name]));
-      return (data ?? []).map((row: any) => ({
+      return (data ?? []).map((row: RawHistoryRow) => ({
         id: row.id,
         childName: nameById.get(row.child_id) ?? "Child",
         status: row.status,
         pickedAt: row.picked_at,
         droppedAt: row.dropped_at,
-        tripType: row.trips.trip_type,
-        startedAt: row.trips.started_at,
+        tripType: row.trips.trip_type as TripType,
+        startedAt: row.trips.started_at as string,
         endedAt: row.trips.ended_at,
         tripStatus: row.trips.status,
       }));

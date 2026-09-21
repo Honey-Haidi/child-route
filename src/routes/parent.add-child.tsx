@@ -21,7 +21,10 @@ export const Route = createFileRoute("/parent/add-child")({
         content: "Register your child for school transport tracking with their home pickup point.",
       },
       { property: "og:title", content: "Add a child — SafeRide" },
-      { property: "og:description", content: "Register your child and home pickup point for SafeRide tracking." },
+      {
+        property: "og:description",
+        content: "Register your child and home pickup point for SafeRide tracking.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -51,7 +54,10 @@ function AddChild() {
   const { data: schools = [] } = useQuery({
     queryKey: ["schools"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("schools").select("id, name, lat, lng").order("name");
+      const { data, error } = await supabase
+        .from("schools")
+        .select("id, name, lat, lng")
+        .order("name");
       if (error) throw error;
       return data ?? [];
     },
@@ -139,10 +145,20 @@ function AddChild() {
         <Panel title="Child details">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Full name">
-              <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} required />
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={80}
+                required
+              />
             </Field>
             <Field label="Class / grade">
-              <Input value={grade} onChange={(e) => setGrade(e.target.value)} maxLength={40} placeholder="Grade 4" />
+              <Input
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                maxLength={40}
+                placeholder="Grade 4"
+              />
             </Field>
             <Field label="School">
               <select
@@ -182,13 +198,29 @@ function AddChild() {
             </Field>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Latitude">
-                <Input value={lat} onChange={(e) => setLat(e.target.value)} inputMode="decimal" required />
+                <Input
+                  value={lat}
+                  onChange={(e) => setLat(e.target.value)}
+                  inputMode="decimal"
+                  required
+                />
               </Field>
               <Field label="Longitude">
-                <Input value={lng} onChange={(e) => setLng(e.target.value)} inputMode="decimal" required />
+                <Input
+                  value={lng}
+                  onChange={(e) => setLng(e.target.value)}
+                  inputMode="decimal"
+                  required
+                />
               </Field>
             </div>
-            <Button type="button" variant="outline" className="h-11 w-fit" disabled={locating} onClick={useCurrentLocation}>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 w-fit"
+              disabled={locating}
+              onClick={useCurrentLocation}
+            >
               {locating ? "Getting location…" : "Use my current location"}
             </Button>
             <p className="text-sm text-muted-foreground">
@@ -201,7 +233,8 @@ function AddChild() {
           {saving ? "Saving…" : "Add child"}
         </Button>
         <p className="text-sm text-muted-foreground">
-          Once added, your school assigns the child to a van and driver. Tracking starts with the next trip.
+          Once added, your school assigns the child to a van and driver. Tracking starts with the
+          next trip.
         </p>
       </form>
     </AppShell>

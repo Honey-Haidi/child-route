@@ -27,7 +27,9 @@ export function AppShell({
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-lg text-primary-foreground">
               🚌
             </span>
-            <span className="hidden font-[family-name:var(--font-display)] sm:inline">SafeRide</span>
+            <span className="hidden font-[family-name:var(--font-display)] sm:inline">
+              SafeRide
+            </span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
             {nav}

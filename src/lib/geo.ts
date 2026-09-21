@@ -8,8 +8,7 @@ export function distanceMeters(a: LatLng, b: LatLng): number {
   const dLng = toRad(b.lng - a.lng);
   const lat1 = toRad(a.lat);
   const lat2 = toRad(b.lat);
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  const h = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
   return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h));
 }
 
@@ -25,7 +24,7 @@ export function formatDistance(meters: number): string {
  */
 export function etaMinutes(meters: number, speedKmh: number | null | undefined): number {
   const speed = speedKmh && speedKmh > 8 ? Math.min(speedKmh, 80) : 22;
-  const minutes = meters / 1000 / speed * 60;
+  const minutes = (meters / 1000 / speed) * 60;
   return Math.max(1, Math.round(minutes));
 }
 

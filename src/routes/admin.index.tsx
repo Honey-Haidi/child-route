@@ -15,9 +15,15 @@ export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
       { title: "School operations — SafeRide" },
-      { name: "description", content: "Live overview of every school vehicle, route and trip in progress." },
+      {
+        name: "description",
+        content: "Live overview of every school vehicle, route and trip in progress.",
+      },
       { property: "og:title", content: "School operations — SafeRide" },
-      { property: "og:description", content: "Live overview of every school vehicle, route and trip in progress." },
+      {
+        property: "og:description",
+        content: "Live overview of every school vehicle, route and trip in progress.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -56,7 +62,10 @@ function AdminDashboard() {
         for (const p of profiles ?? []) names.set(p.user_id, p.full_name);
       }
       return {
-        trips: rows.map((t) => ({ ...t, profiles: { full_name: names.get(t.driver_id) ?? "Driver" } })),
+        trips: rows.map((t) => ({
+          ...t,
+          profiles: { full_name: names.get(t.driver_id) ?? "Driver" },
+        })),
         live: live.data ?? [],
         children: counts[0].count ?? 0,
         routes: counts[1].count ?? 0,
@@ -97,7 +106,10 @@ function AdminDashboard() {
             <Stat label="Vehicles" value={String(data?.vehicles ?? 0)} />
           </div>
 
-          <MapPanel markers={markers} className="h-[360px] w-full overflow-hidden rounded-2xl border border-border" />
+          <MapPanel
+            markers={markers}
+            className="h-[360px] w-full overflow-hidden rounded-2xl border border-border"
+          />
 
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -109,14 +121,17 @@ function AdminDashboard() {
               (data?.trips ?? []).map((trip) => {
                 const l = liveByTrip.get(trip.id) as any;
                 return (
-                  <article key={trip.id} className="surface-card flex flex-wrap items-center justify-between gap-3 p-4">
+                  <article
+                    key={trip.id}
+                    className="surface-card flex flex-wrap items-center justify-between gap-3 p-4"
+                  >
                     <div>
                       <p className="font-semibold">
                         {trip.routes?.name ?? "Route"} · {tripTypeLabel(trip.trip_type as TripType)}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {trip.profiles?.full_name ?? "Driver"} · {trip.vehicles?.reg_no ?? "—"} · started{" "}
-                        {formatTime(trip.started_at)}
+                        {trip.profiles?.full_name ?? "Driver"} · {trip.vehicles?.reg_no ?? "—"} ·
+                        started {formatTime(trip.started_at)}
                       </p>
                     </div>
                     <span

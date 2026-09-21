@@ -17,9 +17,16 @@ export const Route = createFileRoute("/admin/children")({
   head: () => ({
     meta: [
       { title: "Children — SafeRide admin" },
-      { name: "description", content: "Register each child with their family, school, pickup point and emergency contact." },
+      {
+        name: "description",
+        content:
+          "Register each child with their family, school, pickup point and emergency contact.",
+      },
       { property: "og:title", content: "Children — SafeRide admin" },
-      { property: "og:description", content: "Register children with family, school and pickup point." },
+      {
+        property: "og:description",
+        content: "Register children with family, school and pickup point.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -54,7 +61,9 @@ function ChildrenAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("children")
-        .select("id, name, grade, parent_id, school_id, home_address, home_lat, home_lng, active, schools(name)")
+        .select(
+          "id, name, grade, parent_id, school_id, home_address, home_lat, home_lng, active, schools(name)",
+        )
         .order("name");
       if (error) throw error;
       return data as any[];
@@ -90,7 +99,15 @@ function ChildrenAdmin() {
     },
     onSuccess: () => {
       toast.success("Child added");
-      setForm({ ...form, name: "", grade: "", home_address: "", home_lat: "", home_lng: "", emergency_contact: "" });
+      setForm({
+        ...form,
+        name: "",
+        grade: "",
+        home_address: "",
+        home_lat: "",
+        home_lng: "",
+        emergency_contact: "",
+      });
       queryClient.invalidateQueries({ queryKey: ["admin-children"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -98,7 +115,10 @@ function ChildrenAdmin() {
 
   const setParent = useMutation({
     mutationFn: async (args: { id: string; parentId: string | null }) => {
-      const { error } = await supabase.from("children").update({ parent_id: args.parentId }).eq("id", args.id);
+      const { error } = await supabase
+        .from("children")
+        .update({ parent_id: args.parentId })
+        .eq("id", args.id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-children"] }),
@@ -123,11 +143,18 @@ function ChildrenAdmin() {
             }}
           >
             <Field label="Name">
-              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+              <Input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
+              />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Class / grade">
-                <Input value={form.grade} onChange={(e) => setForm({ ...form, grade: e.target.value })} />
+                <Input
+                  value={form.grade}
+                  onChange={(e) => setForm({ ...form, grade: e.target.value })}
+                />
               </Field>
               <Field label="Emergency contact">
                 <Input
@@ -165,14 +192,25 @@ function ChildrenAdmin() {
               </select>
             </Field>
             <Field label="Home address">
-              <Input value={form.home_address} onChange={(e) => setForm({ ...form, home_address: e.target.value })} />
+              <Input
+                value={form.home_address}
+                onChange={(e) => setForm({ ...form, home_address: e.target.value })}
+              />
             </Field>
             <div className="grid grid-cols-3 gap-3">
               <Field label="Latitude">
-                <Input value={form.home_lat} onChange={(e) => setForm({ ...form, home_lat: e.target.value })} required />
+                <Input
+                  value={form.home_lat}
+                  onChange={(e) => setForm({ ...form, home_lat: e.target.value })}
+                  required
+                />
               </Field>
               <Field label="Longitude">
-                <Input value={form.home_lng} onChange={(e) => setForm({ ...form, home_lng: e.target.value })} required />
+                <Input
+                  value={form.home_lng}
+                  onChange={(e) => setForm({ ...form, home_lng: e.target.value })}
+                  required
+                />
               </Field>
               <Field label="Pickup zone (m)">
                 <Input
@@ -193,7 +231,10 @@ function ChildrenAdmin() {
           ) : (
             <div className="space-y-2">
               {children.map((c) => (
-                <div key={c.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3">
+                <div
+                  key={c.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3"
+                >
                   <div>
                     <p className="font-medium">
                       {c.name}
@@ -206,7 +247,9 @@ function ChildrenAdmin() {
                   <select
                     className="h-9 rounded-md border border-input bg-background px-2 text-sm"
                     value={c.parent_id ?? ""}
-                    onChange={(e) => setParent.mutate({ id: c.id, parentId: e.target.value || null })}
+                    onChange={(e) =>
+                      setParent.mutate({ id: c.id, parentId: e.target.value || null })
+                    }
                   >
                     <option value="">No family</option>
                     {parents.map((p) => (

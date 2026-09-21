@@ -17,9 +17,16 @@ export const Route = createFileRoute("/admin/routes")({
   head: () => ({
     meta: [
       { title: "Routes & assignments — SafeRide admin" },
-      { name: "description", content: "Build school runs, assign a driver and vehicle, and choose which children travel on each route." },
+      {
+        name: "description",
+        content:
+          "Build school runs, assign a driver and vehicle, and choose which children travel on each route.",
+      },
       { property: "og:title", content: "Routes & assignments — SafeRide admin" },
-      { property: "og:description", content: "Build school runs and assign drivers, vehicles and children." },
+      {
+        property: "og:description",
+        content: "Build school runs and assign drivers, vehicles and children.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -68,7 +75,9 @@ function RoutesAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("children")
-        .select("id, name, grade, parent_id, school_id, home_address, home_lat, home_lng, active, schools(name)")
+        .select(
+          "id, name, grade, parent_id, school_id, home_address, home_lat, home_lng, active, schools(name)",
+        )
         .order("name");
       if (error) throw error;
       return data as any[];
@@ -80,7 +89,9 @@ function RoutesAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("routes")
-        .select("id, name, school_id, driver_id, vehicle_id, est_minutes, active, schools(name), vehicles(reg_no), route_children(child_id)")
+        .select(
+          "id, name, school_id, driver_id, vehicle_id, est_minutes, active, schools(name), vehicles(reg_no), route_children(child_id)",
+        )
         .order("name");
       if (error) throw error;
       return data as any[];
@@ -103,7 +114,13 @@ function RoutesAdmin() {
     },
   });
 
-  const [form, setForm] = useState({ name: "", school_id: "", driver_id: "", vehicle_id: "", est_minutes: "45" });
+  const [form, setForm] = useState({
+    name: "",
+    school_id: "",
+    driver_id: "",
+    vehicle_id: "",
+    est_minutes: "45",
+  });
   const [stop, setStop] = useState({ label: "", lat: "", lng: "" });
 
   const addRoute = useMutation({
@@ -126,7 +143,11 @@ function RoutesAdmin() {
   });
 
   const updateRoute = useMutation({
-    mutationFn: async (patch: { driver_id?: string | null; vehicle_id?: string | null; active?: boolean }) => {
+    mutationFn: async (patch: {
+      driver_id?: string | null;
+      vehicle_id?: string | null;
+      active?: boolean;
+    }) => {
       const { error } = await supabase.from("routes").update(patch).eq("id", selected!);
       if (error) throw new Error(error.message);
     },
@@ -175,7 +196,10 @@ function RoutesAdmin() {
   const assignedIds: string[] = (current?.route_children ?? []).map((rc: any) => rc.child_id);
 
   return (
-    <AppShell title="Routes & assignments" subtitle="Build a run, give it a driver and vehicle, then add the children.">
+    <AppShell
+      title="Routes & assignments"
+      subtitle="Build a run, give it a driver and vehicle, then add the children."
+    >
       <AdminNav />
       <div className="grid gap-5 lg:grid-cols-[380px_1fr]">
         <div className="space-y-5">
@@ -188,7 +212,11 @@ function RoutesAdmin() {
               }}
             >
               <Field label="Route name">
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                <Input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                />
               </Field>
               <Field label="School">
                 <select
@@ -234,7 +262,10 @@ function RoutesAdmin() {
                   </select>
                 </Field>
                 <Field label="Typical minutes">
-                  <Input value={form.est_minutes} onChange={(e) => setForm({ ...form, est_minutes: e.target.value })} />
+                  <Input
+                    value={form.est_minutes}
+                    onChange={(e) => setForm({ ...form, est_minutes: e.target.value })}
+                  />
                 </Field>
               </div>
               <Button type="submit" className="w-full" disabled={addRoute.isPending}>
@@ -259,8 +290,9 @@ function RoutesAdmin() {
                   >
                     <p className="font-medium">{r.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {r.schools?.name ?? "No school"} · {nameOf(r.driver_id)} · {r.vehicles?.reg_no ?? "No vehicle"} ·{" "}
-                      {(r.route_children ?? []).length} children
+                      {r.schools?.name ?? "No school"} · {nameOf(r.driver_id)} ·{" "}
+                      {r.vehicles?.reg_no ?? "No vehicle"} · {(r.route_children ?? []).length}{" "}
+                      children
                     </p>
                   </button>
                 ))}
@@ -317,12 +349,19 @@ function RoutesAdmin() {
                 {children.map((c) => {
                   const on = assignedIds.includes(c.id);
                   return (
-                    <label key={c.id} className="flex items-center gap-3 rounded-xl border border-border p-3 text-sm">
+                    <label
+                      key={c.id}
+                      className="flex items-center gap-3 rounded-xl border border-border p-3 text-sm"
+                    >
                       <input
                         type="checkbox"
                         checked={on}
                         onChange={(e) =>
-                          toggleChild.mutate({ childId: c.id, on: e.target.checked, seq: assignedIds.length + 1 })
+                          toggleChild.mutate({
+                            childId: c.id,
+                            on: e.target.checked,
+                            seq: assignedIds.length + 1,
+                          })
                         }
                       />
                       <span className="font-medium">{c.name}</span>
@@ -330,7 +369,9 @@ function RoutesAdmin() {
                     </label>
                   );
                 })}
-                {children.length === 0 ? <p className="text-muted-foreground">Add children first.</p> : null}
+                {children.length === 0 ? (
+                  <p className="text-muted-foreground">Add children first.</p>
+                ) : null}
               </div>
             </Panel>
 
@@ -355,13 +396,25 @@ function RoutesAdmin() {
                 }}
               >
                 <Field label="Stop name">
-                  <Input value={stop.label} onChange={(e) => setStop({ ...stop, label: e.target.value })} required />
+                  <Input
+                    value={stop.label}
+                    onChange={(e) => setStop({ ...stop, label: e.target.value })}
+                    required
+                  />
                 </Field>
                 <Field label="Latitude">
-                  <Input value={stop.lat} onChange={(e) => setStop({ ...stop, lat: e.target.value })} required />
+                  <Input
+                    value={stop.lat}
+                    onChange={(e) => setStop({ ...stop, lat: e.target.value })}
+                    required
+                  />
                 </Field>
                 <Field label="Longitude">
-                  <Input value={stop.lng} onChange={(e) => setStop({ ...stop, lng: e.target.value })} required />
+                  <Input
+                    value={stop.lng}
+                    onChange={(e) => setStop({ ...stop, lng: e.target.value })}
+                    required
+                  />
                 </Field>
                 <div className="flex items-end">
                   <Button type="submit" className="w-full" disabled={addStop.isPending}>
@@ -373,7 +426,9 @@ function RoutesAdmin() {
           </div>
         ) : (
           <Panel title="Pick a route">
-            <p className="text-muted-foreground">Choose a route on the left to assign a driver, vehicle and children.</p>
+            <p className="text-muted-foreground">
+              Choose a route on the left to assign a driver, vehicle and children.
+            </p>
           </Panel>
         )}
       </div>

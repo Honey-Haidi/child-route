@@ -32,7 +32,13 @@ const STYLE: any = {
 function markerEl(marker: MapMarker) {
   const el = document.createElement("div");
   const face =
-    marker.kind === "vehicle" ? "🚌" : marker.kind === "home" ? "🏠" : marker.kind === "school" ? "🏫" : "📍";
+    marker.kind === "vehicle"
+      ? "🚌"
+      : marker.kind === "home"
+        ? "🏠"
+        : marker.kind === "school"
+          ? "🏫"
+          : "📍";
   el.style.cssText =
     "display:flex;align-items:center;gap:6px;font:600 12px/1 var(--font-sans);white-space:nowrap;";
   el.innerHTML =

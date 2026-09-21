@@ -91,7 +91,9 @@ export const listAccounts = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role");
-    const { data: profiles } = await supabaseAdmin.from("profiles").select("user_id, full_name, phone");
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("user_id, full_name, phone");
 
     const roleBy = new Map<string, string>();
     for (const r of roles ?? []) roleBy.set(r.user_id, r.role as string);

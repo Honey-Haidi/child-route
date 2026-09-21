@@ -16,9 +16,15 @@ export const Route = createFileRoute("/admin/people")({
   head: () => ({
     meta: [
       { title: "People — SafeRide admin" },
-      { name: "description", content: "Create and review parent, driver and admin accounts for your school transport." },
+      {
+        name: "description",
+        content: "Create and review parent, driver and admin accounts for your school transport.",
+      },
       { property: "og:title", content: "People — SafeRide admin" },
-      { property: "og:description", content: "Create parent, driver and admin accounts for your school transport." },
+      {
+        property: "og:description",
+        content: "Create parent, driver and admin accounts for your school transport.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -30,8 +36,7 @@ export const Route = createFileRoute("/admin/people")({
   ),
 });
 
-const selectClass =
-  "h-10 w-full rounded-md border border-input bg-background px-3 text-sm";
+const selectClass = "h-10 w-full rounded-md border border-input bg-background px-3 text-sm";
 
 function People() {
   const list = useServerFn(listAccounts);
@@ -68,7 +73,15 @@ function People() {
       }),
     onSuccess: () => {
       toast.success("Account created");
-      setForm({ ...form, fullName: "", email: "", password: "", phone: "", licenseNo: "", licenseExpiry: "" });
+      setForm({
+        ...form,
+        fullName: "",
+        email: "",
+        password: "",
+        phone: "",
+        licenseNo: "",
+        licenseExpiry: "",
+      });
       queryClient.invalidateQueries({ queryKey: ["admin-accounts"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -87,10 +100,19 @@ function People() {
             }}
           >
             <Field label="Full name">
-              <Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required />
+              <Input
+                value={form.fullName}
+                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                required
+              />
             </Field>
             <Field label="Email">
-              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
             </Field>
             <Field label="Temporary password">
               <Input
@@ -102,7 +124,10 @@ function People() {
               />
             </Field>
             <Field label="Phone">
-              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
             </Field>
             <Field label="Role">
               <select
@@ -118,7 +143,10 @@ function People() {
             {form.role === "driver" ? (
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Licence no.">
-                  <Input value={form.licenseNo} onChange={(e) => setForm({ ...form, licenseNo: e.target.value })} />
+                  <Input
+                    value={form.licenseNo}
+                    onChange={(e) => setForm({ ...form, licenseNo: e.target.value })}
+                  />
                 </Field>
                 <Field label="Licence expiry">
                   <Input
@@ -141,7 +169,10 @@ function People() {
           ) : (
             <div className="space-y-2">
               {accounts.map((a) => (
-                <div key={a.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3">
+                <div
+                  key={a.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3"
+                >
                   <div>
                     <p className="font-medium">{a.fullName || a.email}</p>
                     <p className="text-sm text-muted-foreground">
@@ -149,7 +180,9 @@ function People() {
                       {a.phone ? ` · ${a.phone}` : ""}
                     </p>
                   </div>
-                  <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium capitalize">{a.role}</span>
+                  <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium capitalize">
+                    {a.role}
+                  </span>
                 </div>
               ))}
             </div>

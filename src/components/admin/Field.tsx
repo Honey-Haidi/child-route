@@ -12,7 +12,9 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 export function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="surface-card p-4">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h2>
       {children}
     </section>
   );

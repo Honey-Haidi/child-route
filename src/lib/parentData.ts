@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
-import { ACTIVE_TRIP_STATUSES, type ChildTripStatus, type TripStatus, type TripType } from "@/lib/status";
+import {
+  ACTIVE_TRIP_STATUSES,
+  type ChildTripStatus,
+  type TripStatus,
+  type TripType,
+} from "@/lib/status";
 
 export type ChildRow = {
   id: string;
@@ -86,7 +91,8 @@ export function useActiveRides(childIds: string[]) {
           .in("user_id", driverIds as string[]);
         const byId = new Map((profiles ?? []).map((p) => [p.user_id, p.full_name]));
         for (const ride of rides) {
-          const driverId = (data ?? []).find((r: any) => r.trip_id === ride.tripId)?.trips.driver_id;
+          const driverId = (data ?? []).find((r: any) => r.trip_id === ride.tripId)?.trips
+            .driver_id;
           ride.driverName = (driverId && byId.get(driverId)) || null;
         }
       }

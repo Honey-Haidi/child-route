@@ -13,9 +13,15 @@ export const Route = createFileRoute("/parent/history")({
   head: () => ({
     meta: [
       { title: "Trip history — SafeRide" },
-      { name: "description", content: "Past school trips with pickup and drop-off times for each child." },
+      {
+        name: "description",
+        content: "Past school trips with pickup and drop-off times for each child.",
+      },
       { property: "og:title", content: "Trip history — SafeRide" },
-      { property: "og:description", content: "Past school trips with pickup and drop-off times for each child." },
+      {
+        property: "og:description",
+        content: "Past school trips with pickup and drop-off times for each child.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -103,12 +109,16 @@ function HistoryPage() {
                       <p className="font-medium">
                         {row.childName} · {tripTypeLabel(row.tripType)}
                       </p>
-                      <span className="text-sm text-muted-foreground">{row.tripStatus.toLowerCase()}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {row.tripStatus.toLowerCase()}
+                      </span>
                     </div>
                     <dl className="mt-2 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
                       <Cell label="Picked up" value={formatTime(row.pickedAt)} />
                       <Cell
-                        label={row.tripType === "MORNING_HOME_TO_SCHOOL" ? "At school" : "Dropped home"}
+                        label={
+                          row.tripType === "MORNING_HOME_TO_SCHOOL" ? "At school" : "Dropped home"
+                        }
                         value={formatTime(row.droppedAt)}
                       />
                       <Cell label="Trip start" value={formatTime(row.startedAt)} />

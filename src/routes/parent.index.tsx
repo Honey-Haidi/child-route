@@ -20,10 +20,14 @@ export const Route = createFileRoute("/parent/")({
       { title: "My children — SafeRide" },
       {
         name: "description",
-        content: "See each child's school transport status, estimated arrival and live vehicle tracking.",
+        content:
+          "See each child's school transport status, estimated arrival and live vehicle tracking.",
       },
       { property: "og:title", content: "My children — SafeRide" },
-      { property: "og:description", content: "Live school transport status for every child in your family." },
+      {
+        property: "og:description",
+        content: "Live school transport status for every child in your family.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -55,7 +59,10 @@ function ParentDashboard() {
   useRealtimeInvalidate(
     "parent-dashboard",
     ["trip_children", "trips", "notifications"],
-    [["active-rides", childIds.join(",")], ["notifications", userId]],
+    [
+      ["active-rides", childIds.join(",")],
+      ["notifications", userId],
+    ],
   );
 
   const rideByChild = new Map(rides.map((r) => [r.childId, r]));
@@ -85,7 +92,8 @@ function ParentDashboard() {
           <h2 className="text-lg font-semibold">No children linked yet</h2>
           <p className="mt-1 text-muted-foreground">
             Add your child with their home pickup point, and your school will place them on a van.
-            To try SafeRide right now, you can also load the demo family (Ali, Sara and Ahmed on Route A).
+            To try SafeRide right now, you can also load the demo family (Ali, Sara and Ahmed on
+            Route A).
           </p>
           <Button asChild className="mt-4 h-11">
             <Link to="/parent/add-child">Add a child</Link>

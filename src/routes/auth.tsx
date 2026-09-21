@@ -18,7 +18,10 @@ export const Route = createFileRoute("/auth")({
           "Sign in to SafeRide to follow your child's school van in real time, or open driver and school admin mode.",
       },
       { property: "og:title", content: "Sign in — SafeRide" },
-      { property: "og:description", content: "Parent, driver and school sign-in for SafeRide live school transport tracking." },
+      {
+        property: "og:description",
+        content: "Parent, driver and school sign-in for SafeRide live school transport tracking.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -183,7 +186,12 @@ function AuthPage() {
           <>
             <div className="space-y-1.5">
               <Label htmlFor="name">Full name</Label>
-              <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+              <Input
+                id="name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="phone">Phone</Label>
@@ -198,7 +206,9 @@ function AuthPage() {
                     type="button"
                     onClick={() => setRole(r)}
                     className={`rounded-xl border px-2 py-2 text-sm capitalize transition-colors ${
-                      role === r ? "border-primary bg-primary/10 font-medium text-primary" : "border-border"
+                      role === r
+                        ? "border-primary bg-primary/10 font-medium text-primary"
+                        : "border-border"
                     }`}
                   >
                     {r === "admin" ? "School" : r}

@@ -353,9 +353,7 @@ export const pushLocation = createServerFn({ method: "POST" })
         .select("id, name, home_lat, home_lng, home_geofence_m, school_id")
         .in("id", childIds);
 
-      const kidById = new Map<string, Kid>(
-        (kids ?? []).map((k) => [k.id as string, k as Kid]),
-      );
+      const kidById = new Map<string, Kid>((kids ?? []).map((k) => [k.id as string, k as Kid]));
 
       for (const rider of riders ?? []) {
         const kid = kidById.get(rider.child_id);

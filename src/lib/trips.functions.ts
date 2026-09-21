@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { distanceMeters } from "@/lib/geo";
@@ -9,7 +9,16 @@ const MAX_JUMP_KMH = 200;
 const FUTURE_SKEW_MS = 60_000;
 const MAX_AGE_MS = 10 * 60_000;
 
-type Ctx = { supabase: any; userId: string };
+type Ctx = { supabase: SupabaseClient; userId: string };
+
+type Kid = {
+  id: string;
+  name: string;
+  home_lat: number;
+  home_lng: number;
+  home_geofence_m: number | null;
+  school_id: string | null;
+};
 
 async function log(ctx: Ctx, action: string, entity: string, entityId: string, meta: unknown = {}) {
   await ctx.supabase.from("audit_logs").insert({

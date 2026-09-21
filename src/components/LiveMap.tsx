@@ -1,5 +1,8 @@
 import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
+import type { GeoJSONSource, Map as MLMap, Marker, StyleSpecification } from "maplibre-gl";
+
+type MapLibreModule = typeof import("maplibre-gl");
 
 export type MapMarker = {
   id: string;
@@ -16,7 +19,7 @@ type Props = {
   follow?: boolean;
 };
 
-const STYLE: any = {
+const STYLE: StyleSpecification = {
   version: 8,
   sources: {
     osm: {
@@ -53,15 +56,15 @@ function markerEl(marker: MapMarker) {
 
 export default function LiveMap({ markers, path, className, follow = true }: Props) {
   const container = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const markerRefs = useRef<Map<string, any>>(new Map());
-  const libRef = useRef<any>(null);
+  const mapRef = useRef<MLMap | null>(null);
+  const markerRefs = useRef<Map<string, Marker>>(new Map());
+  const libRef = useRef<MapLibreModule | null>(null);
   const fittedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const mod: any = await import("maplibre-gl");
+      const mod = await import("maplibre-gl");
       const maplibre = mod.default ?? mod;
       if (cancelled || !container.current || mapRef.current) return;
       libRef.current = maplibre;
@@ -120,7 +123,7 @@ export default function LiveMap({ markers, path, className, follow = true }: Pro
         geometry: { type: "LineString" as const, coordinates: path ?? [] },
       };
       if (map.getSource("route")) {
-        (map.getSource("route") as any).setData(line);
+        (map.getSource("route") as GeoJSONSource).setData(line);
       } else if (path && path.length > 1) {
         map.addSource("route", { type: "geojson", data: line });
         map.addLayer({

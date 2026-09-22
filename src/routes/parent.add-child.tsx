@@ -124,24 +124,31 @@ function AddChild() {
     }
     setSaving(true);
     const v = parsed.data;
-    const { error } = await supabase.from("children").insert({
-      parent_id: userId!,
-      name: v.name,
-      grade: v.grade ?? null,
-      school_id: v.schoolId,
-      home_address: v.address ?? null,
-      emergency_contact: v.emergency ?? null,
-      home_lat: v.lat,
-      home_lng: v.lng,
-    });
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const res = await saveChild({
+        data: {
+          name: v.name,
+          grade: v.grade ?? null,
+          schoolId: v.schoolId,
+          address: v.address ?? null,
+          emergency: v.emergency ?? null,
+          lat: v.lat,
+          lng: v.lng,
+          routeId: routeId || null,
+        },
+      });
+      await queryClient.invalidateQueries({ queryKey: ["children", userId] });
+      toast.success(
+        res.routeName
+          ? `${v.name} added and attached to ${res.routeName}`
+          : `${v.name} added — the school will place them on a van`,
+      );
+      navigate({ to: "/parent" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not add the child");
+    } finally {
+      setSaving(false);
     }
-    await queryClient.invalidateQueries({ queryKey: ["children", userId] });
-    toast.success(`${v.name} added — the school will place them on a route`);
-    navigate({ to: "/parent" });
   }
 
   return (

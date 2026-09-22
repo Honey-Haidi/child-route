@@ -52,6 +52,9 @@ function AddChild() {
   const { userId } = useSession();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const saveChild = useServerFn(addChild);
+  const loadRoutes = useServerFn(listRoutesForSchool);
+
 
   const { data: schools = [] } = useQuery({
     queryKey: ["schools"],

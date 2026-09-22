@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
+import { addChild, listRoutesForSchool } from "@/lib/parent.functions";
 
 export const Route = createFileRoute("/parent/add-child")({
   head: () => ({
@@ -50,6 +52,9 @@ function AddChild() {
   const { userId } = useSession();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const saveChild = useServerFn(addChild);
+  const loadRoutes = useServerFn(listRoutesForSchool);
+
 
   const { data: schools = [] } = useQuery({
     queryKey: ["schools"],
@@ -70,8 +75,16 @@ function AddChild() {
   const [emergency, setEmergency] = useState("");
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
+  const [routeId, setRouteId] = useState("");
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
+
+  const { data: routes = [], isLoading: routesLoading } = useQuery({
+    queryKey: ["school-routes", schoolId],
+    enabled: !!schoolId,
+    queryFn: () => loadRoutes({ data: { schoolId } }),
+  });
+
 
   function useCurrentLocation() {
     if (!("geolocation" in navigator)) {
@@ -111,24 +124,31 @@ function AddChild() {
     }
     setSaving(true);
     const v = parsed.data;
-    const { error } = await supabase.from("children").insert({
-      parent_id: userId!,
-      name: v.name,
-      grade: v.grade ?? null,
-      school_id: v.schoolId,
-      home_address: v.address ?? null,
-      emergency_contact: v.emergency ?? null,
-      home_lat: v.lat,
-      home_lng: v.lng,
-    });
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const res = await saveChild({
+        data: {
+          name: v.name,
+          grade: v.grade ?? null,
+          schoolId: v.schoolId,
+          address: v.address ?? null,
+          emergency: v.emergency ?? null,
+          lat: v.lat,
+          lng: v.lng,
+          routeId: routeId || null,
+        },
+      });
+      await queryClient.invalidateQueries({ queryKey: ["children", userId] });
+      toast.success(
+        res.routeName
+          ? `${v.name} added and attached to ${res.routeName}`
+          : `${v.name} added — the school will place them on a van`,
+      );
+      navigate({ to: "/parent" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not add the child");
+    } finally {
+      setSaving(false);
     }
-    await queryClient.invalidateQueries({ queryKey: ["children", userId] });
-    toast.success(`${v.name} added — the school will place them on a route`);
-    navigate({ to: "/parent" });
   }
 
   return (
@@ -164,7 +184,10 @@ function AddChild() {
               <select
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 value={schoolId}
-                onChange={(e) => setSchoolId(e.target.value)}
+                onChange={(e) => {
+                  setSchoolId(e.target.value);
+                  setRouteId("");
+                }}
                 required
               >
                 <option value="">Select a school</option>
@@ -184,6 +207,62 @@ function AddChild() {
               />
             </Field>
           </div>
+        </Panel>
+
+        <Panel title="Van and driver">
+          {!schoolId ? (
+            <p className="text-sm text-muted-foreground">Choose a school first.</p>
+          ) : routesLoading ? (
+            <p className="text-sm text-muted-foreground">Looking for vans…</p>
+          ) : routes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No vans are set up for this school yet — the school will assign one.
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {routes.map((r) => {
+                const full = r.seats != null && r.assigned >= r.seats;
+                return (
+                  <label
+                    key={r.id}
+                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm ${
+                      routeId === r.id ? "border-primary bg-primary/5" : "border-border"
+                    } ${full ? "opacity-60" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name="route"
+                      className="mt-1"
+                      checked={routeId === r.id}
+                      disabled={full}
+                      onChange={() => setRouteId(r.id)}
+                    />
+                    <span>
+                      <span className="block font-medium">
+                        {r.driverName ?? "Driver to be assigned"}
+                      </span>
+                      <span className="block text-muted-foreground">
+                        {r.name}
+                        {r.vehicleReg ? ` · ${r.vehicleReg}` : ""} ·{" "}
+                        {r.seats != null
+                          ? `${r.assigned}/${r.seats} seats taken${full ? " (full)" : ""}`
+                          : `${r.assigned} children`}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-3 text-sm">
+                <input
+                  type="radio"
+                  name="route"
+                  checked={routeId === ""}
+                  onChange={() => setRouteId("")}
+                />
+                <span>Let the school decide</span>
+              </label>
+            </div>
+          )}
         </Panel>
 
         <Panel title="Home pickup point">

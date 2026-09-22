@@ -209,6 +209,62 @@ function AddChild() {
           </div>
         </Panel>
 
+        <Panel title="Van and driver">
+          {!schoolId ? (
+            <p className="text-sm text-muted-foreground">Choose a school first.</p>
+          ) : routesLoading ? (
+            <p className="text-sm text-muted-foreground">Looking for vans…</p>
+          ) : routes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No vans are set up for this school yet — the school will assign one.
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {routes.map((r) => {
+                const full = r.seats != null && r.assigned >= r.seats;
+                return (
+                  <label
+                    key={r.id}
+                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm ${
+                      routeId === r.id ? "border-primary bg-primary/5" : "border-border"
+                    } ${full ? "opacity-60" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name="route"
+                      className="mt-1"
+                      checked={routeId === r.id}
+                      disabled={full}
+                      onChange={() => setRouteId(r.id)}
+                    />
+                    <span>
+                      <span className="block font-medium">
+                        {r.driverName ?? "Driver to be assigned"}
+                      </span>
+                      <span className="block text-muted-foreground">
+                        {r.name}
+                        {r.vehicleReg ? ` · ${r.vehicleReg}` : ""} ·{" "}
+                        {r.seats != null
+                          ? `${r.assigned}/${r.seats} seats taken${full ? " (full)" : ""}`
+                          : `${r.assigned} children`}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-3 text-sm">
+                <input
+                  type="radio"
+                  name="route"
+                  checked={routeId === ""}
+                  onChange={() => setRouteId("")}
+                />
+                <span>Let the school decide</span>
+              </label>
+            </div>
+          )}
+        </Panel>
+
         <Panel title="Home pickup point">
           <div className="grid gap-3">
             <Field label="Home address">

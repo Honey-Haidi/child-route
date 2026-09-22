@@ -75,8 +75,16 @@ function AddChild() {
   const [emergency, setEmergency] = useState("");
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
+  const [routeId, setRouteId] = useState("");
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
+
+  const { data: routes = [], isLoading: routesLoading } = useQuery({
+    queryKey: ["school-routes", schoolId],
+    enabled: !!schoolId,
+    queryFn: () => loadRoutes({ data: { schoolId } }),
+  });
+
 
   function useCurrentLocation() {
     if (!("geolocation" in navigator)) {

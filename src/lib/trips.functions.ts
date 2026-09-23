@@ -144,7 +144,10 @@ export const startTrip = createServerFn({ method: "POST" })
       .eq("route_id", route.id)
       .in("status", ["STARTED", "IN_PROGRESS", "DELAYED"])
       .maybeSingle();
-    if (existing) return { tripId: existing.id as string, resumed: true };
+    if (existing) {
+      await syncRiders(ctx, existing.id as string, route.id as string, data.tripType);
+      return { tripId: existing.id as string, resumed: true };
+    }
 
     const { data: trip, error } = await ctx.supabase
       .from("trips")

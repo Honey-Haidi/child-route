@@ -51,6 +51,71 @@ async function notifyParent(
   });
 }
 
+/**
+ * Adds any children assigned to the route that are not yet on the trip.
+ * Keeps the driver's child list correct when a child is attached after the trip started.
+ */
+async function syncRiders(ctx: Ctx, tripId: string, routeId: string, tripType: string) {
+  const { data: assigned } = await ctx.supabase
+    .from("route_children")
+    .select("child_id, seq")
+    .eq("route_id", routeId)
+    .order("seq");
+  if (!assigned?.length) return [];
+
+  const { data: current } = await ctx.supabase
+    .from("trip_children")
+    .select("child_id")
+    .eq("trip_id", tripId);
+  const have = new Set((current ?? []).map((r: { child_id: string }) => r.child_id));
+
+  const rows = (assigned as { child_id: string; seq: number }[])
+    .filter((r) => !have.has(r.child_id))
+    .map((r) => ({
+      trip_id: tripId,
+      child_id: r.child_id,
+      seq: r.seq,
+      status: "WAITING_FOR_PICKUP" as const,
+    }));
+  if (!rows.length) return [];
+
+  const { error } = await ctx.supabase.from("trip_children").insert(rows);
+  if (error) throw new Error(error.message);
+
+  const morning = tripType === "MORNING_HOME_TO_SCHOOL";
+  for (const row of rows) {
+    await notifyParent(ctx, {
+      childId: row.child_id,
+      tripId,
+      type: morning ? "TRIP_STARTED" : "SCHOOL_DEPARTURE",
+      title: morning ? "School trip has started" : "Vehicle has left school",
+      body: morning
+        ? "The school vehicle has started its morning route."
+        : "The school vehicle has left school and is heading home.",
+    });
+  }
+  return rows;
+}
+
+/** Re-checks the route roster and adds any newly assigned children to a running trip. */
+export const syncTripChildren = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ tripId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const ctx = context as unknown as Ctx;
+    const { data: trip, error } = await ctx.supabase
+      .from("trips")
+      .select("id, driver_id, route_id, trip_type, status")
+      .eq("id", data.tripId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!trip || trip.driver_id !== ctx.userId) throw new Error("Trip not found.");
+    if (!["STARTED", "IN_PROGRESS", "DELAYED"].includes(trip.status as string))
+      return { added: 0 };
+    const rows = await syncRiders(ctx, trip.id as string, trip.route_id as string, trip.trip_type);
+    return { added: rows.length };
+  });
+
 /** Driver starts a morning or afternoon trip on a route assigned to them. */
 export const startTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

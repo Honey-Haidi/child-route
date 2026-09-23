@@ -255,6 +255,13 @@ function DriverTrip() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Children on this trip ({remaining.length} remaining)
           </h2>
+          {riders.length === 0 ? (
+            <div className="surface-card p-5 text-sm text-muted-foreground">
+              No children are assigned to this route yet, so there is nobody to pick up. Ask the
+              school admin to add children to this route (Admin → Routes), or have the parent choose
+              this van when adding their child. They appear here automatically once assigned.
+            </div>
+          ) : null}
           {riders.map((rider) => {
             const done = ["ARRIVED_AT_SCHOOL", "DROPPED_OFF", "ABSENT", "CANCELLED"].includes(
               rider.status,

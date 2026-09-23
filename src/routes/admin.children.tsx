@@ -11,7 +11,7 @@ import { Field, Panel } from "@/components/admin/Field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { listAccounts } from "@/lib/admin.functions";
+import { deleteChild, listAccounts } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/children")({
   head: () => ({
@@ -56,6 +56,7 @@ type AdminChildRow = {
 function ChildrenAdmin() {
   const queryClient = useQueryClient();
   const list = useServerFn(listAccounts);
+  const removeChildFn = useServerFn(deleteChild);
 
   const { data: accounts = [] } = useQuery({ queryKey: ["admin-accounts"], queryFn: () => list() });
   const parents = accounts.filter((a) => a.role === "parent");
@@ -135,6 +136,15 @@ function ChildrenAdmin() {
       if (error) throw new Error(error.message);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-children"] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const removeChild = useMutation({
+    mutationFn: (childId: string) => removeChildFn({ data: { childId } }),
+    onSuccess: () => {
+      toast.success("Child removed");
+      queryClient.invalidateQueries({ queryKey: ["admin-children"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -257,20 +267,38 @@ function ChildrenAdmin() {
                       {c.schools?.name ?? "No school"} · {parentName(c.parent_id)}
                     </p>
                   </div>
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                    value={c.parent_id ?? ""}
-                    onChange={(e) =>
-                      setParent.mutate({ id: c.id, parentId: e.target.value || null })
-                    }
-                  >
-                    <option value="">No family</option>
-                    {parents.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.fullName || p.email}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <select
+                      className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                      value={c.parent_id ?? ""}
+                      onChange={(e) =>
+                        setParent.mutate({ id: c.id, parentId: e.target.value || null })
+                      }
+                    >
+                      <option value="">No family</option>
+                      {parents.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.fullName || p.email}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={removeChild.isPending}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Remove ${c.name}? They will be taken off every route and their trip history is deleted.`,
+                          )
+                        ) {
+                          removeChild.mutate(c.id);
+                        }
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

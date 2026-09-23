@@ -55,7 +55,6 @@ function AddChild() {
   const saveChild = useServerFn(addChild);
   const loadRoutes = useServerFn(listRoutesForSchool);
 
-
   const { data: schools = [] } = useQuery({
     queryKey: ["schools"],
     queryFn: async () => {
@@ -84,7 +83,6 @@ function AddChild() {
     enabled: !!schoolId,
     queryFn: () => loadRoutes({ data: { schoolId } }),
   });
-
 
   function useCurrentLocation() {
     if (!("geolocation" in navigator)) {

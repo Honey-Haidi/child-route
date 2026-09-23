@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
+import { deleteChild } from "@/lib/admin.functions";
 import { claimDemoData } from "@/lib/trips.functions";
 import { useProfile, useSession } from "@/lib/auth";
 import { useActiveRides, useMyChildren, type ActiveRide, type ChildRow } from "@/lib/parentData";
@@ -130,6 +131,17 @@ function ParentDashboard() {
 }
 
 function ChildCard({ child, ride }: { child: ChildRow; ride?: ActiveRide | undefined }) {
+  const queryClient = useQueryClient();
+  const removeChildFn = useServerFn(deleteChild);
+  const removeChild = useMutation({
+    mutationFn: () => removeChildFn({ data: { childId: child.id } }),
+    onSuccess: () => {
+      toast.success(`${child.name} removed`);
+      queryClient.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <article className="surface-card flex flex-col gap-4 p-5">
       <header className="flex items-center gap-3">
@@ -181,6 +193,22 @@ function ChildCard({ child, ride }: { child: ChildRow; ride?: ActiveRide | undef
           </Button>
         </>
       )}
+      <Button
+        variant="ghost"
+        className="h-10 text-sm text-destructive hover:text-destructive"
+        disabled={removeChild.isPending}
+        onClick={() => {
+          if (
+            window.confirm(
+              `Remove ${child.name} from SafeRide? They will be taken off the van and you will stop receiving alerts.`,
+            )
+          ) {
+            removeChild.mutate();
+          }
+        }}
+      >
+        Remove child
+      </Button>
     </article>
   );
 }

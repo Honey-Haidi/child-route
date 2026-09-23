@@ -11,7 +11,7 @@ import type { MapMarker } from "@/components/LiveMap";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
-import { endTrip, reportIssue, setChildStatus } from "@/lib/trips.functions";
+import { endTrip, reportIssue, setChildStatus, syncTripChildren } from "@/lib/trips.functions";
 import { useDriverTracking } from "@/lib/useDriverTracking";
 import { useRealtimeInvalidate } from "@/lib/useRealtime";
 import {

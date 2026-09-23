@@ -167,7 +167,10 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as unknown as SupabaseClient;
 
-    const { data: roleRows } = await admin.from("user_roles").select("role").eq("user_id", data.userId);
+    const { data: roleRows } = await admin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
     const roles = (roleRows ?? []).map((r: { role: string }) => r.role as string);
 
     // Parent: remove their children first.
@@ -185,7 +188,10 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
       if ((activeTrips ?? []).length > 0) {
         throw new Error("This driver is on a trip right now. End the trip before removing them.");
       }
-      await admin.from("routes").update({ driver_id: null, active: false }).eq("driver_id", data.userId);
+      await admin
+        .from("routes")
+        .update({ driver_id: null, active: false })
+        .eq("driver_id", data.userId);
       await admin.from("vehicles").update({ driver_id: null }).eq("driver_id", data.userId);
       await admin.from("drivers").delete().eq("user_id", data.userId);
     }

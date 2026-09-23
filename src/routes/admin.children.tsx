@@ -268,36 +268,36 @@ function ChildrenAdmin() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                    value={c.parent_id ?? ""}
-                    onChange={(e) =>
-                      setParent.mutate({ id: c.id, parentId: e.target.value || null })
-                    }
-                  >
-                    <option value="">No family</option>
-                    {parents.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.fullName || p.email}
-                      </option>
-                    ))}
-                  </select>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={removeChild.isPending}
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          `Remove ${c.name}? They will be taken off every route and their trip history is deleted.`,
-                        )
-                      ) {
-                        removeChild.mutate(c.id);
+                    <select
+                      className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                      value={c.parent_id ?? ""}
+                      onChange={(e) =>
+                        setParent.mutate({ id: c.id, parentId: e.target.value || null })
                       }
-                    }}
-                  >
-                    Remove
-                  </Button>
+                    >
+                      <option value="">No family</option>
+                      {parents.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.fullName || p.email}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={removeChild.isPending}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Remove ${c.name}? They will be taken off every route and their trip history is deleted.`,
+                          )
+                        ) {
+                          removeChild.mutate(c.id);
+                        }
+                      }}
+                    >
+                      Remove
+                    </Button>
                   </div>
                 </div>
               ))}

@@ -110,8 +110,7 @@ export const syncTripChildren = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!trip || trip.driver_id !== ctx.userId) throw new Error("Trip not found.");
-    if (!["STARTED", "IN_PROGRESS", "DELAYED"].includes(trip.status as string))
-      return { added: 0 };
+    if (!["STARTED", "IN_PROGRESS", "DELAYED"].includes(trip.status as string)) return { added: 0 };
     const rows = await syncRiders(ctx, trip.id as string, trip.route_id as string, trip.trip_type);
     return { added: rows.length };
   });

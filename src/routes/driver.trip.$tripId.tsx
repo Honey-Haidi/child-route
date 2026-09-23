@@ -110,6 +110,19 @@ function DriverTrip() {
     },
   });
 
+  const syncRiders = useServerFn(syncTripChildren);
+
+  useQuery({
+    queryKey: ["trip-sync", tripId],
+    enabled: !!userId,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const res = await syncRiders({ data: { tripId } });
+      if (res.added > 0) await queryClient.invalidateQueries({ queryKey: ["trip-riders", tripId] });
+      return res;
+    },
+  });
+
   const { data: riders = [] } = useQuery({
     queryKey: ["trip-riders", tripId],
     queryFn: async (): Promise<Rider[]> => {

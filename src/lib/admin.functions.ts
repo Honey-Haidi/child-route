@@ -110,16 +110,13 @@ export const listAccounts = createServerFn({ method: "POST" })
     }));
   });
 
-async function purgeChild(
-  admin: { from: (t: string) => any },
-  childId: string,
-): Promise<void> {
+async function purgeChild(admin: SupabaseClient, childId: string): Promise<void> {
   await admin.from("trip_events").delete().eq("child_id", childId);
   await admin.from("notifications").delete().eq("child_id", childId);
   await admin.from("trip_children").delete().eq("child_id", childId);
   await admin.from("route_children").delete().eq("child_id", childId);
   const { error } = await admin.from("children").delete().eq("id", childId);
-  if (error) throw new Error((error as { message: string }).message);
+  if (error) throw new Error(error.message);
 }
 
 /** Remove a child. Allowed for an admin, or for the child's own parent. */
@@ -145,7 +142,7 @@ export const deleteChild = createServerFn({ method: "POST" })
     if (!isAdmin && child.parent_id !== ctx.userId) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await purgeChild(supabaseAdmin as unknown as { from: (t: string) => any }, data.childId);
+    await purgeChild(supabaseAdmin as unknown as SupabaseClient, data.childId);
 
     await ctx.supabase.from("audit_logs").insert({
       actor: ctx.userId,
@@ -168,7 +165,7 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
     if (data.userId === ctx.userId) throw new Error("You cannot delete your own account");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const admin = supabaseAdmin as unknown as { from: (t: string) => any };
+    const admin = supabaseAdmin as unknown as SupabaseClient;
 
     const { data: roleRows } = await admin.from("user_roles").select("role").eq("user_id", data.userId);
     const roles = (roleRows ?? []).map((r: { role: string }) => r.role as string);

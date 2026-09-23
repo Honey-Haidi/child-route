@@ -10,7 +10,7 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import { Field, Panel } from "@/components/admin/Field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createUserAccount, listAccounts } from "@/lib/admin.functions";
+import { createUserAccount, deleteUserAccount, listAccounts } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/people")({
   head: () => ({
@@ -41,6 +41,7 @@ const selectClass = "h-10 w-full rounded-md border border-input bg-background px
 function People() {
   const list = useServerFn(listAccounts);
   const create = useServerFn(createUserAccount);
+  const removeAccount = useServerFn(deleteUserAccount);
   const queryClient = useQueryClient();
 
   const { data: accounts = [], isLoading } = useQuery({
@@ -83,6 +84,16 @@ function People() {
         licenseExpiry: "",
       });
       queryClient.invalidateQueries({ queryKey: ["admin-accounts"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: (userId: string) => removeAccount({ data: { userId } }),
+    onSuccess: () => {
+      toast.success("Account removed");
+      queryClient.invalidateQueries({ queryKey: ["admin-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-children"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -180,9 +191,30 @@ function People() {
                       {a.phone ? ` · ${a.phone}` : ""}
                     </p>
                   </div>
-                  <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium capitalize">
-                    {a.role}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium capitalize">
+                      {a.role}
+                    </span>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={remove.isPending}
+                      onClick={() => {
+                        const label = a.fullName || a.email;
+                        const extra =
+                          a.role === "parent"
+                            ? " Their children and alerts will be removed too."
+                            : a.role === "driver"
+                              ? " Their van and route will be unassigned."
+                              : "";
+                        if (window.confirm(`Remove ${label}?${extra} This cannot be undone.`)) {
+                          remove.mutate(a.id);
+                        }
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

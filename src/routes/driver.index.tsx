@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
+import { DriverRoster } from "@/components/DriverRoster";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSession } from "@/lib/auth";
 import { claimDemoData, startTrip } from "@/lib/trips.functions";
@@ -182,6 +183,14 @@ function DriverHome() {
                       A trip is already running on this route.
                     </p>
                   ) : null}
+                  <details className="mt-4 rounded-xl border border-border p-3">
+                    <summary className="cursor-pointer text-sm font-semibold">
+                      Manage children on this route
+                    </summary>
+                    <div className="mt-3">
+                      <DriverRoster routeId={route.id} />
+                    </div>
+                  </details>
                 </div>
               );
             })

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { listAccounts } from "@/lib/admin.functions";
+import { deleteRoute } from "@/lib/routes.functions";
 
 export const Route = createFileRoute("/admin/routes")({
   head: () => ({
@@ -70,6 +71,8 @@ function RoutesAdmin() {
   const queryClient = useQueryClient();
   const list = useServerFn(listAccounts);
   const [selected, setSelected] = useState<string | null>(null);
+  const removeRoute = useServerFn(deleteRoute);
+  const [deleting, setDeleting] = useState(false);
 
   const { data: accounts = [] } = useQuery({ queryKey: ["admin-accounts"], queryFn: () => list() });
   const drivers = accounts.filter((a) => a.role === "driver");
@@ -330,6 +333,29 @@ function RoutesAdmin() {
         {current ? (
           <div className="space-y-5">
             <Panel title={`${current.name} — assignments`}>
+              <div className="mb-3 flex justify-end">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={deleting}
+                  onClick={async () => {
+                    if (!confirm(`Delete route "${current.name}"? Its stops, children list and trip history will be removed.`)) return;
+                    setDeleting(true);
+                    try {
+                      await removeRoute({ data: { routeId: current.id } });
+                      setSelected(null);
+                      await queryClient.invalidateQueries();
+                      toast.success("Route deleted");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Could not delete route");
+                    } finally {
+                      setDeleting(false);
+                    }
+                  }}
+                >
+                  Delete route
+                </Button>
+              </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Driver">
                   <select

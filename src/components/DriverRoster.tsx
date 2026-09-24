@@ -76,7 +76,9 @@ export function DriverRoster({ routeId }: { routeId: string }) {
           onChange={(e) => setPick(e.target.value)}
         >
           <option value="">
-            {available.length ? "Add a child from this school…" : "No other children at this school"}
+            {available.length
+              ? "Add a child from this school…"
+              : "No other children at this school"}
           </option>
           {available.map((c) => (
             <option key={c.id} value={c.id}>

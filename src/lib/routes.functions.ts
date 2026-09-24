@@ -39,7 +39,10 @@ export const deleteRoute = createServerFn({ method: "POST" })
     if (!(await rolesOf(ctx)).includes("admin")) throw new Error("Forbidden");
     const admin = await adminClient();
 
-    const { data: trips } = await admin.from("trips").select("id, status").eq("route_id", data.routeId);
+    const { data: trips } = await admin
+      .from("trips")
+      .select("id, status")
+      .eq("route_id", data.routeId);
     const all = (trips ?? []) as { id: string; status: string }[];
     if (all.some((t) => ["STARTED", "IN_PROGRESS", "DELAYED"].includes(t.status))) {
       throw new Error("A trip is running on this route. End it before deleting the route.");
@@ -82,11 +85,13 @@ export const getDriverRoster = createServerFn({ method: "POST" })
       .select("child_id, seq, children(name, grade, home_address)")
       .eq("route_id", route.id)
       .order("seq");
-    const assigned = ((onRoute ?? []) as unknown as {
-      child_id: string;
-      seq: number;
-      children: { name: string; grade: string | null; home_address: string | null } | null;
-    }[]).map((r) => ({
+    const assigned = (
+      (onRoute ?? []) as unknown as {
+        child_id: string;
+        seq: number;
+        children: { name: string; grade: string | null; home_address: string | null } | null;
+      }[]
+    ).map((r) => ({
       id: r.child_id,
       seq: r.seq,
       name: r.children?.name ?? "Child",
@@ -94,7 +99,8 @@ export const getDriverRoster = createServerFn({ method: "POST" })
       address: r.children?.home_address ?? null,
     }));
 
-    let available: { id: string; name: string; grade: string | null; address: string | null }[] = [];
+    let available: { id: string; name: string; grade: string | null; address: string | null }[] =
+      [];
     if (route.school_id) {
       const { data: kids } = await admin
         .from("children")
@@ -103,7 +109,14 @@ export const getDriverRoster = createServerFn({ method: "POST" })
         .eq("active", true)
         .order("name");
       const taken = new Set(assigned.map((a) => a.id));
-      available = ((kids ?? []) as { id: string; name: string; grade: string | null; home_address: string | null }[])
+      available = (
+        (kids ?? []) as {
+          id: string;
+          name: string;
+          grade: string | null;
+          home_address: string | null;
+        }[]
+      )
         .filter((k) => !taken.has(k.id))
         .map((k) => ({ id: k.id, name: k.name, grade: k.grade, address: k.home_address }));
     }
@@ -135,7 +148,8 @@ export const driverSetRouteChild = createServerFn({ method: "POST" })
     if (!child) throw new Error("Child not found");
 
     if (data.action === "ADD") {
-      if (child.school_id !== route.school_id) throw new Error("This child goes to a different school");
+      if (child.school_id !== route.school_id)
+        throw new Error("This child goes to a different school");
       const { data: existing } = await admin
         .from("route_children")
         .select("id")
@@ -150,9 +164,11 @@ export const driverSetRouteChild = createServerFn({ method: "POST" })
           .order("seq", { ascending: false })
           .limit(1)
           .maybeSingle();
-        const { error } = await admin
-          .from("route_children")
-          .insert({ route_id: route.id, child_id: child.id, seq: ((last?.seq as number) ?? 0) + 1 });
+        const { error } = await admin.from("route_children").insert({
+          route_id: route.id,
+          child_id: child.id,
+          seq: ((last?.seq as number) ?? 0) + 1,
+        });
         if (error) throw new Error(error.message);
       }
     } else {

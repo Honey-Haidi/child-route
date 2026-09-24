@@ -339,7 +339,12 @@ function RoutesAdmin() {
                   size="sm"
                   disabled={deleting}
                   onClick={async () => {
-                    if (!confirm(`Delete route "${current.name}"? Its stops, children list and trip history will be removed.`)) return;
+                    if (
+                      !confirm(
+                        `Delete route "${current.name}"? Its stops, children list and trip history will be removed.`,
+                      )
+                    )
+                      return;
                     setDeleting(true);
                     try {
                       await removeRoute({ data: { routeId: current.id } });
